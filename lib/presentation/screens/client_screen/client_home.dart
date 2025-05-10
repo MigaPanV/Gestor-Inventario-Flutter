@@ -21,8 +21,8 @@ class ClientHome extends StatelessWidget {
               Expanded(
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 200,
-                    childAspectRatio: 4, 
+                    maxCrossAxisExtent: 250,
+                    childAspectRatio: 3 / 4, 
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),
@@ -33,18 +33,19 @@ class ClientHome extends StatelessWidget {
                     return Card(
                       elevation: 10,
                       clipBehavior: Clip.antiAlias,
+                      
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: Image.network(
-                                  product.imageurl,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                ),
+                                product.imageurl,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
                               ),
+                            ),
                             
-                            SizedBox(height: 10),
+                            SizedBox(height: 5),
 
                             Row(
                               children: [
@@ -53,7 +54,12 @@ class ClientHome extends StatelessWidget {
                                     padding: const EdgeInsets.symmetric(horizontal: 10),
                                     child: Text(
                                       product.nameProduct, 
-                                      style: TextStyle(fontWeight: FontWeight.bold)),
+                                      style: TextStyle(   
+                                        fontWeight: FontWeight.bold, 
+                                        overflow: TextOverflow.ellipsis
+                                      ),
+                                      maxLines: 2
+                                    ),
                                   ),
                                 ),
 
@@ -70,7 +76,7 @@ class ClientHome extends StatelessWidget {
                               child: Text('\$${product.priceProduct}'),
                             ),
 
-                            SizedBox(height: 25),
+                            SizedBox(height: 5),
                           ],
                         ),
                       

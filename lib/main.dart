@@ -7,7 +7,6 @@ import 'package:gestor_inventario/firebase_options.dart';
 import 'package:gestor_inventario/presentation/screens/auth_page.dart';
 import 'package:gestor_inventario/presentation/screens/client_screen/client_page.dart';
 
-
 import 'package:gestor_inventario/presentation/providers/auth_provider.dart';
 import 'package:gestor_inventario/presentation/providers/products_client_provider.dart';
 
