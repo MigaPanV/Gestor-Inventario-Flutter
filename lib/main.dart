@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/presentation/screens/admin/admin_home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:gestor_inventario/firebase_options.dart';
 
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 162, 201, 219)),
             ),
-            home:  authProvider.user != null ? ClientScreen() : AuthScreen(),
+            home: AdminHomePage()// authProvider.user != null ? ClientScreen() : AuthScreen(),
           );
         },
         
