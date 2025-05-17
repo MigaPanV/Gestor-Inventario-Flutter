@@ -89,8 +89,9 @@ class ClientCartPage extends StatelessWidget {
                                   ),
                           
                                   IconButton(
+                                    tooltip: 'Eliminar todo',
                                     onPressed: (){
-                                      //if()
+
                                       productCartProvider.deleteCart(product);
                                       product.stockProduct += product.cantidadAgregada;
                                       product.cantidadAgregada = 0;
