@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gestor_inventario/presentation/providers/firebase_provider.dart';
-import 'package:gestor_inventario/presentation/screens/auth/loading_auth_screen.dart';
+import 'package:gestor_inventario/presentation/screens/auth/loading_screen.dart';
 import 'package:gestor_inventario/presentation/widgets/shared/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +9,8 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    //TODO mejorar la captura de errores
 
     final registerProvider = context.watch<FirebaseProvider>();
     

@@ -7,6 +7,9 @@ class ClientCartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    //TODO mejora de la vision de los precios y añadir un snackbar al precionar el boton y no hayan productos en stock
+
     final productCartProvider = context.watch<ProductsClientProvider>();
     
     if(productCartProvider.listCart.isEmpty){
@@ -106,7 +109,7 @@ class ClientCartPage extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('\$${product.priceProduct}'),
+                                    Text('\$${product.priceProduct * product.cantidadAgregada}'),
                                     Text('Cantidad: ${product.cantidadAgregada}')
                                   ],
                                 ),
