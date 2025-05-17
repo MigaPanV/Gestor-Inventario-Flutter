@@ -92,6 +92,8 @@ class ClientCartPage extends StatelessWidget {
                                     onPressed: (){
                                       //if()
                                       productCartProvider.deleteCart(product);
+                                      product.stockProduct += product.cantidadAgregada;
+                                      product.cantidadAgregada = 0;
                                     },
                                     icon: Icon(Icons.delete)
                                   ),
