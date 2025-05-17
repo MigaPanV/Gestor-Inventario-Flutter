@@ -3,7 +3,8 @@ class Product {
   final String nameProduct;
   final String descriptionProduct;
   final int priceProduct;
-  final int stockProduct;
+  int stockProduct;
+  int cantidadAgregada;
   final String imageurl;
 
   Product({
@@ -11,6 +12,8 @@ class Product {
     required this.descriptionProduct, 
     required this.priceProduct, 
     required this.stockProduct, 
-    required this.imageurl
+    required this.imageurl,
+    this.cantidadAgregada = 0
+    
     });
 }

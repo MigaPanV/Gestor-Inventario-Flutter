@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
 
-class LoadingPage extends StatelessWidget {
-  const LoadingPage({super.key});
+class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({super.key, required this.text});
+
+  final String text;
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +14,7 @@ class LoadingPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
           CircularProgressIndicator(),
-          Text('Verificando Datos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),)
+          Text(text, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),)
         ]),
       ),
     );
