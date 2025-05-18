@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gestor_inventario/presentation/providers/products_client_provider.dart';
+import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
+import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
 
 class AdminHomePage extends StatelessWidget {
@@ -9,6 +10,7 @@ class AdminHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final productProvider = context.watch<ProductsClientProvider>();
+    final firestoreProvider = context.watch<FirebasefirestoreProvider>();
 
     return SafeArea(
       child: Scaffold(
@@ -133,7 +135,11 @@ class AdminHomePage extends StatelessWidget {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-          
+            firestoreProvider.clearData();
+            productProvider.openDialogAddProduct(context);
+            
+
+            
         },
         child: Icon(Icons.add),
         ),

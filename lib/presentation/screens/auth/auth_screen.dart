@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestor_inventario/presentation/providers/firebase_provider.dart';
+import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
 import 'package:gestor_inventario/presentation/screens/client/client_screen.dart';
 import 'package:gestor_inventario/presentation/screens/auth/loading_screen.dart';
 import 'package:gestor_inventario/presentation/screens/register/register_screen.dart';
@@ -13,7 +13,7 @@ class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //TODO mejorar la captura de errores
-    final authProvider = Provider.of<FirebaseProvider>(context); //context.watch<AuthProvider>();
+    final authProvider = Provider.of<FirebaseAuthProvider>(context); //context.watch<AuthProvider>();
 
     if(authProvider.isLoading){
       return const LoadingScreen(text: 'verificando Datos',);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestor_inventario/presentation/providers/products_client_provider.dart';
+import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
 
 class ClientCartPage extends StatelessWidget {

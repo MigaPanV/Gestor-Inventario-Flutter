@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/screens/admin/admin_home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:gestor_inventario/firebase_options.dart';
@@ -8,8 +8,8 @@ import 'package:gestor_inventario/firebase_options.dart';
 import 'package:gestor_inventario/presentation/screens/auth/auth_screen.dart';
 import 'package:gestor_inventario/presentation/screens/client/client_screen.dart';
 
-import 'package:gestor_inventario/presentation/providers/firebase_provider.dart';
-import 'package:gestor_inventario/presentation/providers/products_client_provider.dart';
+import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
+import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,23 +25,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    //final db = FirebaseFirestore.instance;
-//
-    //final usuario = <String, dynamic>{
-    //  "first": "Ada",
-    //  "last": "Lovelace",
-    //  "born": 1815
-    //};
-    //db.collection("usuario").add(usuario).then((DocumentReference doc) =>
-    //  print('DocumentSnapshot added with ID: ${doc.id}'));
-
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => FirebaseProvider()),
-        ChangeNotifierProvider(create: (_) => ProductsClientProvider())
-        //ChangeNotifierProvider(create: (_) => ProductsProvider())
+        ChangeNotifierProvider(create: (_) => FirebaseAuthProvider()),
+        ChangeNotifierProvider(create: (_) => ProductsClientProvider()..addList()),
+        ChangeNotifierProvider(create: (_) => FirebasefirestoreProvider())
       ],
-      child: Consumer<FirebaseProvider>(
+      child: Consumer<FirebaseAuthProvider>(
         builder: (context, authProvider, child) {
 
           return MaterialApp(
@@ -54,7 +44,7 @@ class MyApp extends StatelessWidget {
             home: AdminHomePage()// authProvider.user != null ? ClientScreen() : AuthScreen(),
           );
         },
-        
+
       ),
     );
   }
