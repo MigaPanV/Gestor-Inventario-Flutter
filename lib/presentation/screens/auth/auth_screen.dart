@@ -75,8 +75,6 @@ class AuthScreen extends StatelessWidget {
       
                           debugPrint(authProvider.email);
                           debugPrint(authProvider.password);
-                          authProvider.email = '';
-                          authProvider.password = '';
                         }
                       }, 
                       child: Text(
