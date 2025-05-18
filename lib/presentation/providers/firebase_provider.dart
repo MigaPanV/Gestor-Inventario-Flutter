@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class FirebaseProvider extends ChangeNotifier{
-
+class FirebaseProvider extends ChangeNotifier {
   User? user;
 
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -69,11 +68,22 @@ class FirebaseProvider extends ChangeNotifier{
       userAuthStatus();
       
     }on FirebaseAuthException catch (e) {
-      if (e.code == 'user not found') {
-        generalError = 'Usuario no encontrado';
-      } else if (e.code == 'wrong password') {
+      if (e.code == 'user-not-found' || e.code == 'unknown-error') {
+        generalError = 'Datos ivalidos';
+      } else if (e.code == 'wrong-password') {
         generalError = 'Contraseña incorrecta';
-      } else {
+      } 
+      else if(e.code == "invalid-email"){
+        generalError = 'Datos invalidos';
+      }
+      else if(email.isEmpty && e.code == 'invalid-email'){
+        generalError = null;
+        emaillError = 'Ingrese un correo';
+      }
+      else if(e.code == 'unknown-error'){
+        passwordError = 'Contraseña invalida';
+      }
+      else {
         generalError = 'Error: ${e.message}';
       }
 
