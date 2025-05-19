@@ -6,7 +6,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gestor_inventario/domain/entities/product.dart';
 import 'package:gestor_inventario/infrastructure/model/database_products_model.dart';
+import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:gestor_inventario/services/select_images.dart';
+import 'package:provider/provider.dart';
 
 class FirebasefirestoreProvider extends ChangeNotifier{
 
@@ -125,31 +127,32 @@ void setUploaded(bool value) {
 
   Future<bool> uploadImage() async{
 
-    debugPrint('$imageToUpload');
-
     final String nameFile = imageToUpload!.path.split('/').last;
 
     final Reference ref = storage.ref().child('images').child(nameFile);
     
     final UploadTask uploadTask = ref.putFile(imageToUpload!);
-    
-    debugPrint('$uploadTask');
 
     final TaskSnapshot snapshot = await uploadTask.whenComplete(() => true);
-    
-    debugPrint('$snapshot');
 
     final String url = await snapshot.ref.getDownloadURL();
 
     getUrl(url);
-
-    debugPrint(url);
     notifyListeners();
 
     if(snapshot.state == TaskState.success){
       return true;
     }
     return false;
+  }
+
+  Future<void> deleteProduct(BuildContext context, Product product) async{
+
+    final clientProvider = context.read<ProductsClientProvider>();
+
+    clientProvider.deleteToList(product);
+    await firestore.collection("productos").doc(product.nameProduct).delete();
+    notifyListeners();
   }
 
 

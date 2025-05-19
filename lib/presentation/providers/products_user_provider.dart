@@ -38,7 +38,7 @@ class ProductsClientProvider extends ChangeNotifier{
 
   int selectedIndex = 0;
   
-  Future<void> addList() async{
+  Future<void> addToList() async{
 
     
     final newProducts = await FirebasefirestoreProvider().getProducts();
@@ -51,6 +51,12 @@ class ProductsClientProvider extends ChangeNotifier{
       listProduct.addAll(uniqueProducts);
       notifyListeners();
     }
+  }
+
+  Future<void> deleteToList(Product product) async {
+    listProduct.removeWhere((p) => p.nameProduct == product.nameProduct);
+    debugPrint('$listProduct');
+    notifyListeners();
   }
 
   void addCart(Product product){
@@ -128,7 +134,7 @@ class ProductsClientProvider extends ChangeNotifier{
                         onPressed: () {
                           firestore.clearData();
                           firestore.isUploaded = false;
-                          productProvider.addList();
+                          productProvider.addToList();
                           Navigator.pop(dialogContext);
                         },
                         child: Text('Continuar'),
@@ -188,9 +194,10 @@ class ProductsClientProvider extends ChangeNotifier{
                             debugPrint('path: ${firestore.imageToUpload}');
                             return;
                         } 
-                        await firestore.uploadImage();
+                        
                         if (firestore.validateTextField()) {
                           firestore.setLoading(true);
+                          await firestore.uploadImage();
                           await firestore.addProduct();
                           
                           
@@ -209,6 +216,35 @@ class ProductsClientProvider extends ChangeNotifier{
       },
     );
     notifyListeners();
+  }
+
+  void openDeleteProduct(BuildContext context, Product product){
+
+    showDialog(
+      barrierDismissible: false,
+      context: context, 
+      builder: (dialogcontext) {
+        return Consumer<FirebasefirestoreProvider>(
+          builder: (context, firestore, _) => StatefulBuilder(
+            builder: (context, setState) => AlertDialog(
+              content: Text('¿Desea eliminar este articulo?'),
+              actions: [
+                TextButton(
+                  onPressed: (){
+                    Navigator.pop(dialogcontext);
+                  }, 
+                  child: Text('Cancelar')),
+                FilledButton(
+                  onPressed: (){
+                    firestore.deleteProduct(dialogcontext, product);
+                    Navigator.pop(dialogcontext);
+                  }, 
+                  child: Text('Eliminar'))
+              ],
+            ),
+          ),
+        );
+      });
   }
 
   void openDialogSignout(BuildContext context){
@@ -242,11 +278,5 @@ class ProductsClientProvider extends ChangeNotifier{
     );
     notifyListeners();
   }
-
-
-
-
-
-
 
 }

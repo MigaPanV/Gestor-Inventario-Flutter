@@ -110,7 +110,7 @@ class AdminHomeScreen extends StatelessWidget {
                                     Expanded(child: Text('\$${product.priceProduct}')),
                                     IconButton(
                                     onPressed: () {
-                                  
+                                      productProvider.openDeleteProduct(context, product);
                                     },
                                     icon: Icon(Icons.delete)),
                                     SizedBox(width: 2)
