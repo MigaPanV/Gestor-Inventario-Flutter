@@ -5,7 +5,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gestor_inventario/domain/entities/product.dart';
 import 'package:gestor_inventario/infrastructure/model/database_products_model.dart';
+import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:gestor_inventario/services/select_images.dart';
+import 'package:provider/provider.dart';
 
 class FirebasefirestoreProvider extends ChangeNotifier {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -16,7 +18,14 @@ class FirebasefirestoreProvider extends ChangeNotifier {
 
   String nameProduct = '';
   String descriptionProduct = '';
+
   String imageurl = '';
+  String sku = '';
+
+  String newNameProduct = '';
+  String newDescriptionProduct = '';
+  int newStockProduct = 0;
+  int newPriceProduct = 0;
 
   String priceInput = '';
   String stockInput = '';
@@ -96,7 +105,24 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     return isValid;
   }
 
-  void getName(String value) {
+  void getNewName(String value){
+    newNameProduct = value;
+    notifyListeners();
+  }
+  void getNewDescription(String value){
+    newDescriptionProduct = value;
+    notifyListeners();
+  }
+  void getNewStock(String value){
+    newStockProduct = int.parse(value);
+    notifyListeners();
+  }
+  void getnewprice(String value){
+    newPriceProduct = int.parse(value);
+    notifyListeners();
+  }
+  
+  void getName(String value){
     nameProduct = value;
     errorName = null;
     notifyListeners();
@@ -137,6 +163,16 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     isUploaded = value;
     notifyListeners();
   }
+  
+  void generateSKU(String productName) {
+    final prefix = productName.length >= 3
+        ? productName.substring(0, 3).toUpperCase()
+        : productName.toUpperCase();
+
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString().substring(7); 
+    sku = '$prefix-$timestamp';
+    notifyListeners();
+  }
 
   Future<void> addProduct() async {
     isUploaded = false;
@@ -150,13 +186,13 @@ class FirebasefirestoreProvider extends ChangeNotifier {
       imageurl: imageurl,
       stockProduct: stockProduct!,
       priceProduct: priceProduct!,
+      sku: sku
     );
-
     try {
       isLoading = true;
       notifyListeners();
-      await firestore.collection('productos').doc(nameProduct).set(product.tofirebase());
-      debugPrint('producto añadido');
+      
+      await firestore.collection('productos').doc(sku).set(product.tofirebase());
       isUploaded = true;
     } 
     on FirebaseException catch (e) {
@@ -191,10 +227,62 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     final UploadTask uploadTask = ref.putFile(imageToUpload!);
 
     final TaskSnapshot snapshot = await uploadTask.whenComplete(() => true);
+    
     final String url = await snapshot.ref.getDownloadURL();
 
     getUrl(url);
 
     return snapshot.state == TaskState.success;
   }
+
+  Future<void> deleteProduct(BuildContext context, Product product) async{
+
+    final clientProvider = context.read<ProductsClientProvider>();
+
+    try{
+      isLoading = true;
+      clientProvider.deleteToList(product);
+      await firestore.collection("productos").doc(product.sku).delete();
+      isLoading = false;
+      isUploaded = true;
+    }on FirebaseException catch (e){
+
+      debugPrint(e.code);
+
+    }
+    isLoading = false;
+    
+    notifyListeners();
+  }
+
+  Future<void> setProduct(BuildContext context, Product product) async{
+    isUploaded = false;
+    isLoading = false;
+    final clientProvider = context.read<ProductsClientProvider>();
+
+    final newProduct = DatabaseProductsModel(
+      nameProduct: newNameProduct, 
+      descriptionProduct: newDescriptionProduct, 
+      imageurl: imageurl,
+      stockProduct: newStockProduct,
+      priceProduct: newPriceProduct,
+      sku: product.sku
+      );
+    
+    try{
+
+      isLoading = true;
+      await firestore.collection('productos').doc(product.sku).set(newProduct.tofirebase());
+      clientProvider.updateList();
+      debugPrint('producto actualizado');
+      isLoading = false;
+      isUploaded = true;
+
+    }on FirebaseException catch (e){
+      debugPrint(e.code);
+    }
+    isLoading = false;
+    notifyListeners();
+  }
+
 }

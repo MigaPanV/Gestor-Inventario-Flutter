@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => FirebaseAuthProvider()),
-        ChangeNotifierProvider(create: (_) => ProductsClientProvider()..addList()),
+        ChangeNotifierProvider(create: (_) => ProductsClientProvider()..addToList()),
         ChangeNotifierProvider(create: (_) => FirebasefirestoreProvider())
       ],
       child: Consumer<FirebaseAuthProvider>(

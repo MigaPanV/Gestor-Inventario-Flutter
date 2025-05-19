@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
 import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,8 @@ class AdminHomeScreen extends StatelessWidget {
       leading: IconButton(
         onPressed: () {
           
+          productProvider.openDialogSignout(context);
+
         },
         icon: Icon(Icons.door_back_door_outlined),
       ),
@@ -29,7 +32,15 @@ class AdminHomeScreen extends StatelessWidget {
     ),
         body: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
+          child: productProvider.listProduct.isEmpty ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: Text('No hay productos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                      ),
+            ],
+          ):
+          Column(
             children: [
               Expanded(
                 child: GridView.builder(
@@ -93,6 +104,7 @@ class AdminHomeScreen extends StatelessWidget {
 
                               IconButton(
                                 onPressed: () {
+                                  productProvider.openUpdateProduct(context, product);
                                   
                                 },
                                 icon: Icon(Icons.edit)),
@@ -110,7 +122,7 @@ class AdminHomeScreen extends StatelessWidget {
                                     Expanded(child: Text('\$${product.priceProduct}')),
                                     IconButton(
                                     onPressed: () {
-                                  
+                                      productProvider.openDeleteProduct(context, product);
                                     },
                                     icon: Icon(Icons.delete)),
                                     SizedBox(width: 2)
@@ -130,8 +142,7 @@ class AdminHomeScreen extends StatelessWidget {
                 ) 
               ),
             ],
-          ),
-        ),
+          ) ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             firestoreProvider.clearData();
@@ -139,6 +150,7 @@ class AdminHomeScreen extends StatelessWidget {
         },
         child: Icon(Icons.add),
         ),
-      ));
+      )
+    );
   }
 }
