@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/domain/entities/product.dart';
 import 'package:gestor_inventario/infrastructure/model/database_products_model.dart';
 
 class FirebasefirestoreProvider extends ChangeNotifier{
@@ -26,7 +27,7 @@ class FirebasefirestoreProvider extends ChangeNotifier{
     stockProduct = 0;
     priceProduct = 0;
     notifyListeners();
-    
+
   }
 
   bool validateTextField(){
@@ -101,8 +102,11 @@ void setUploaded(bool value) {
     notifyListeners();
   }
 
-  Future<void> getProducts() async{
+  Future<List<Product>> getProducts() async{
 
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('productos').get();
+    
+    return querySnapshot.docs.map((doc) => DatabaseProductsModel.fromFirestore(doc.data() as Map<String, dynamic>).toProductEntity()).toList();
   }
 
 

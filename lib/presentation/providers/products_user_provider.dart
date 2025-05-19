@@ -5,7 +5,6 @@ import 'package:gestor_inventario/domain/entities/product.dart';
 import 'package:gestor_inventario/infrastructure/model/database_products_model.dart';
 import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
 import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
-import 'package:gestor_inventario/presentation/screens/auth/loading_screen.dart';
 import 'package:gestor_inventario/presentation/widgets/shared/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
@@ -44,11 +43,9 @@ class ProductsClientProvider extends ChangeNotifier{
   Future<void> addList() async{
 
     
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('productos').get();
-    
-    final newproducts = querySnapshot.docs.map((doc) => DatabaseProductsModel.fromFirestore(doc.data() as Map<String, dynamic>).toProductEntity()).toList();
-    
-    final uniqueProducts = newproducts.where((newProduct) {
+    final newProducts = await FirebasefirestoreProvider().getProducts();
+
+    final uniqueProducts = newProducts.where((newProduct) {
       return !listProduct.any((existingProduct) => existingProduct.nameProduct == newProduct.nameProduct);
     }).toList();
 

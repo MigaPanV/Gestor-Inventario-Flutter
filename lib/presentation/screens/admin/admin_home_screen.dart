@@ -3,8 +3,8 @@ import 'package:gestor_inventario/presentation/providers/firebasefirestore_provi
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
 
-class AdminHomePage extends StatelessWidget {
-  const AdminHomePage({super.key});
+class AdminHomeScreen extends StatelessWidget {
+  const AdminHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class AdminHomePage extends StatelessWidget {
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
 
                     maxCrossAxisExtent: 250,
-                    childAspectRatio: 3 / 4, 
+                    childAspectRatio: 3 / 4,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
 
@@ -122,7 +122,6 @@ class AdminHomePage extends StatelessWidget {
                           ),
 
                           SizedBox(height: 10),
-
                           
                         ],
                       ),
@@ -137,9 +136,6 @@ class AdminHomePage extends StatelessWidget {
           onPressed: () {
             firestoreProvider.clearData();
             productProvider.openDialogAddProduct(context);
-            
-
-            
         },
         child: Icon(Icons.add),
         ),
