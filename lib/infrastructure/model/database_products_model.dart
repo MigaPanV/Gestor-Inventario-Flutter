@@ -7,6 +7,7 @@ class DatabaseProductsModel {
   final int priceProduct;
   int stockProduct;
   final String imageurl;
+  final String sku;
 
   DatabaseProductsModel({
     required this.nameProduct, 
@@ -14,6 +15,8 @@ class DatabaseProductsModel {
     required this.priceProduct, 
     required this.stockProduct, 
     required this.imageurl,
+    required this.sku, 
+
     });
 
   factory DatabaseProductsModel.fromFirestore(Map<String, dynamic> firestore)  => DatabaseProductsModel(
@@ -22,6 +25,7 @@ class DatabaseProductsModel {
     imageurl: firestore['imageurl'] ?? 'No image url',
     priceProduct: firestore['price'] ?? 0,
     stockProduct: firestore['stock'] ?? 0,
+    sku: firestore['sku'] ?? 'No sku'
   );
 
   Map<String, dynamic> tofirebase() => {
@@ -29,7 +33,8 @@ class DatabaseProductsModel {
     'description': descriptionProduct,
     'imageurl': imageurl,
     'price': priceProduct,
-    'stock': stockProduct
+    'stock': stockProduct,
+    'sku': sku
   };
 
   Product toProductEntity() => Product(
@@ -37,7 +42,8 @@ class DatabaseProductsModel {
     descriptionProduct: descriptionProduct,
     priceProduct: priceProduct,
     stockProduct: stockProduct,
-    imageurl: imageurl
+    imageurl: imageurl,
+    sku: sku
   );
 
 }

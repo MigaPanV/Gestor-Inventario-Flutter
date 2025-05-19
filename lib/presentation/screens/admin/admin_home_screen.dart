@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
 import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
@@ -17,11 +18,11 @@ class AdminHomeScreen extends StatelessWidget {
         appBar: AppBar(
       leading: IconButton(
         onPressed: () {
-          // Acción al presionar
+          productProvider.openDialogSignout(context);
         },
         icon: Icon(Icons.door_back_door_outlined),
       ),
-      centerTitle: true, // <- Esto centra el título
+      centerTitle: true,
       title: Text(
         'Inventario',
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
@@ -29,7 +30,15 @@ class AdminHomeScreen extends StatelessWidget {
     ),
         body: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
+          child: productProvider.listProduct.isEmpty ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: Text('No hay productos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                      ),
+            ],
+          ):
+          Column(
             children: [
               Expanded(
                 child: GridView.builder(
@@ -93,6 +102,7 @@ class AdminHomeScreen extends StatelessWidget {
 
                               IconButton(
                                 onPressed: () {
+                                  productProvider.openUpdateProduct(context, product);
                                   
                                 },
                                 icon: Icon(Icons.edit)),
@@ -130,8 +140,7 @@ class AdminHomeScreen extends StatelessWidget {
                 ) 
               ),
             ],
-          ),
-        ),
+          ) ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             firestoreProvider.clearData();
@@ -139,6 +148,7 @@ class AdminHomeScreen extends StatelessWidget {
         },
         child: Icon(Icons.add),
         ),
-      ));
+      )
+    );
   }
 }

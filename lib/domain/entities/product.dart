@@ -6,6 +6,7 @@ class Product {
   int stockProduct;
   int cantidadAgregada;
   final String imageurl;
+  final String sku;
 
   Product({
     required this.nameProduct, 
@@ -13,6 +14,7 @@ class Product {
     required this.priceProduct, 
     required this.stockProduct, 
     required this.imageurl,
+    required this.sku, 
     this.cantidadAgregada = 0
     
     });

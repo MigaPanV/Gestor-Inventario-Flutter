@@ -23,6 +23,12 @@ class FirebasefirestoreProvider extends ChangeNotifier{
   String imageurl = '' ;
   int stockProduct = 0;
   int priceProduct = 0;
+  String sku = '';
+
+  String newNameProduct = '';
+  String newDescriptionProduct = '';
+  int newStockProduct = 0;
+  int newPriceProduct = 0;
 
   File? imageToUpload;
 
@@ -47,6 +53,23 @@ class FirebasefirestoreProvider extends ChangeNotifier{
     }
     errorgeneral = null;
     return true;
+  }
+
+  void getNewName(String value){
+    newNameProduct = value;
+    notifyListeners();
+  }
+  void getNewDescription(String value){
+    newDescriptionProduct = value;
+    notifyListeners();
+  }
+  void getNewStock(String value){
+    newStockProduct = int.parse(value);
+    notifyListeners();
+  }
+  void getnewprice(String value){
+    newPriceProduct = int.parse(value);
+    notifyListeners();
   }
   
   void getName(String value){
@@ -75,12 +98,22 @@ class FirebasefirestoreProvider extends ChangeNotifier{
   }
   
   void setLoading(bool value) {
-  isLoading = value;
-  notifyListeners();
-}
+    isLoading = value;
+    notifyListeners();
+  }
 
-void setUploaded(bool value) {
-  isUploaded = value;
+  void setUploaded(bool value) {
+    isUploaded = value;
+    notifyListeners();
+  }
+
+  void generateSKU(String productName) {
+  final prefix = productName.length >= 3
+      ? productName.substring(0, 3).toUpperCase()
+      : productName.toUpperCase();
+  
+  final timestamp = DateTime.now().millisecondsSinceEpoch.toString().substring(7); 
+  sku = '$prefix-$timestamp';
   notifyListeners();
 }
 
@@ -93,13 +126,14 @@ void setUploaded(bool value) {
       descriptionProduct: descriptionProduct, 
       imageurl: imageurl,
       stockProduct: stockProduct,
-      priceProduct: priceProduct
+      priceProduct: priceProduct,
+      sku: sku
       );
     
     try{
 
       isLoading = true;
-      await firestore.collection('productos').doc(nameProduct).set(product.tofirebase());
+      await firestore.collection('productos').doc(sku).set(product.tofirebase());
       debugPrint('producto añadido');
       isLoading = false;
       isUploaded = true;
@@ -150,8 +184,49 @@ void setUploaded(bool value) {
 
     final clientProvider = context.read<ProductsClientProvider>();
 
-    clientProvider.deleteToList(product);
-    await firestore.collection("productos").doc(product.nameProduct).delete();
+    try{
+      isLoading = true;
+      clientProvider.deleteToList(product);
+      await firestore.collection("productos").doc(product.sku).delete();
+      isLoading = false;
+      isUploaded = true;
+    }on FirebaseException catch (e){
+
+      debugPrint(e.code);
+
+    }
+    isLoading = false;
+    
+    notifyListeners();
+  }
+
+  Future<void> setProduct(BuildContext context, Product product) async{
+    isUploaded = false;
+    isLoading = false;
+    final clientProvider = context.read<ProductsClientProvider>();
+
+    final newProduct = DatabaseProductsModel(
+      nameProduct: newNameProduct, 
+      descriptionProduct: newDescriptionProduct, 
+      imageurl: imageurl,
+      stockProduct: newStockProduct,
+      priceProduct: newPriceProduct,
+      sku: product.sku
+      );
+    
+    try{
+
+      isLoading = true;
+      await firestore.collection('productos').doc(product.sku).set(newProduct.tofirebase());
+      clientProvider.updateList();
+      debugPrint('producto actualizado');
+      isLoading = false;
+      isUploaded = true;
+
+    }on FirebaseException catch (e){
+      debugPrint(e.code);
+    }
+    isLoading = false;
     notifyListeners();
   }
 
