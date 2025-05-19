@@ -1,13 +1,9 @@
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gestor_inventario/domain/entities/product.dart';
-import 'package:gestor_inventario/infrastructure/model/database_products_model.dart';
 import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
 import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/widgets/shared/custom_text_field.dart';
-import 'package:gestor_inventario/services/select_images.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class ProductsClientProvider extends ChangeNotifier{
