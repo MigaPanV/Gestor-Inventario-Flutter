@@ -104,8 +104,9 @@ class AdminHomeScreen extends StatelessWidget {
 
                               IconButton(
                                 onPressed: () {
+                                  final provider = context.read<FirebasefirestoreProvider>();
+                                  provider.loadProductToEdit(product);
                                   productProvider.openUpdateProduct(context, product);
-                                  
                                 },
                                 icon: Icon(Icons.edit)),
                               SizedBox(width: 10)
