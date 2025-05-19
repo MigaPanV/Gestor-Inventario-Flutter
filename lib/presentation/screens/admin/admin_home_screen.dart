@@ -17,11 +17,11 @@ class AdminHomeScreen extends StatelessWidget {
         appBar: AppBar(
       leading: IconButton(
         onPressed: () {
-          // Acción al presionar
+          
         },
         icon: Icon(Icons.door_back_door_outlined),
       ),
-      centerTitle: true, // <- Esto centra el título
+      centerTitle: true,
       title: Text(
         'Inventario',
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),

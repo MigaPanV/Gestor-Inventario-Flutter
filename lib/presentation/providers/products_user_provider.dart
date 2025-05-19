@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:gestor_inventario/domain/entities/product.dart';
 import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
@@ -37,14 +36,13 @@ class ProductsClientProvider extends ChangeNotifier{
   List<Product> listCart = [];
 
   int selectedIndex = 0;
-  
-  Future<void> addList() async{
 
-    
+  Future<void> addList() async {
     final newProducts = await FirebasefirestoreProvider().getProducts();
 
     final uniqueProducts = newProducts.where((newProduct) {
-      return !listProduct.any((existingProduct) => existingProduct.nameProduct == newProduct.nameProduct);
+      return !listProduct.any((existingProduct) =>
+          existingProduct.nameProduct == newProduct.nameProduct);
     }).toList();
 
     if (uniqueProducts.isNotEmpty) {
@@ -53,61 +51,57 @@ class ProductsClientProvider extends ChangeNotifier{
     }
   }
 
-  void addCart(Product product){
-
+  void addCart(Product product) {
     listCart.add(product);
     notifyListeners();
-
   }
 
-  void changeIndex(index){
-    selectedIndex = index; 
+  void changeIndex(index) {
+    selectedIndex = index;
     notifyListeners();
   }
 
-  void deleteCart(Product product){
+  void deleteCart(Product product) {
     listCart.remove(product);
     notifyListeners();
   }
 
-  void updateCart(){
+  void updateCart() {
     notifyListeners();
   }
 
   void openDialogAddProduct(BuildContext context) {
-
     final rootContext = context;
-
+    String? generalerror = '';
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (dialogContext) {
-        
         return Consumer<FirebasefirestoreProvider>(
           builder: (context, firestore, _) {
-            return StatefulBuilder(
-              builder: (context, setState){
+            return StatefulBuilder(builder: (context, setState) {
+              if (firestore.isLoading) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('Añadiendo datos',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w500)),
+                      )
+                    ],
+                  ),
+                );
+              }
 
-                if (firestore.isLoading) {
-                  return AlertDialog(
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text('Añadiendo datos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                        )
-                      ],
-                    ),
-                  );
-                }
-
-                if (!firestore.isLoading && firestore.isUploaded) {
-                  final productProvider = context.read<ProductsClientProvider>();
+              if (!firestore.isLoading && firestore.isUploaded) {
+                final productProvider = context.read<ProductsClientProvider>();
                 return AlertDialog(
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -117,17 +111,19 @@ class ProductsClientProvider extends ChangeNotifier{
                         children: [
                           Text(
                             'Datos cargados',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(width: 10),
-                          Icon(Icons.check_circle, color: Colors.green, size: 40),
+                          Icon(Icons.check_circle,
+                              color: Colors.green, size: 40),
                         ],
                       ),
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
                           firestore.clearData();
-                          firestore.isUploaded = false;
+                          firestore.setUploaded(false);
                           productProvider.addList();
                           Navigator.pop(dialogContext);
                         },
@@ -137,73 +133,76 @@ class ProductsClientProvider extends ChangeNotifier{
                   ),
                 );
               }
-                return AlertDialog(
-                  title: Text('Añadir producto'),
-                  
-                  content: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CustomTextField(
-                          onChanged: firestore.getName,
-                          errorText: firestore.errorgeneral,
-                          labeltext: 'Nombre del producto',
-                        ),
-                        CustomTextField(
-                          onChanged: firestore.getDescription,
-                          errorText: firestore.errorgeneral,
-                          labeltext: 'Descripción del producto',
-                        ),
-                        CustomTextField(
-                          onChanged: firestore.getPrice,
-                          errorText: null,
-                          labeltext: 'Precio del producto',
-                        ),
-                        CustomTextField(
-                          onChanged: firestore.getStock,
-                          errorText: null,
-                          labeltext: 'Stock del producto',
-                        ),
-                        SizedBox(height: 20),
-                        FilledButton(
-                          onPressed: ()async{
-                            await firestore.getImage();
-                          }, 
-                          child: Text('Cargar foto')
-                        )
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(rootContext);
-                      },
-                      child: Text('Cancelar'),
-                    ),
-                    FilledButton(
-                      onPressed: () async {
 
-                        if(firestore.imageToUpload == null){
-                            debugPrint('path: ${firestore.imageToUpload}');
-                            return;
-                        } 
-                        await firestore.uploadImage();
-                        if (firestore.validateTextField()) {
-                          firestore.setLoading(true);
-                          await firestore.addProduct();
-                          
-                          
-                          firestore.setLoading(false);
-                          firestore.setUploaded(true);
-                        }
-                      },
-                      child: Text('Añadir'),
-                    ),
+              return AlertDialog(
+                title: Column(
+                  children: [
+                    Text('Añadir producto'),
+                    Text('$generalerror', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.w400),)
                   ],
-                );
-              }
-            );
+                ),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CustomTextField(
+                        onChanged: firestore.getName,
+                        errorText: firestore.errorName,
+                        labeltext: 'Nombre del producto',
+                      ),
+                      CustomTextField(
+                        onChanged: firestore.getDescription,
+                        errorText: firestore.errorDescription,
+                        labeltext: 'Descripción del producto',
+                      ),
+                      CustomTextField(
+                        onChanged: firestore.getPrice,
+                        errorText: firestore.errorPrice,
+                        labeltext: 'Precio del producto',
+                      ),
+                      CustomTextField(
+                        onChanged: firestore.getStock,
+                        errorText: firestore.errorStock,
+                        labeltext: 'Stock del producto',
+                      ),
+                      SizedBox(height: 20),
+                      FilledButton(
+                          onPressed: () async {
+                            await firestore.getImage();
+                            debugPrint('${firestore.imageToUpload}');
+                          },
+                          child: Text('Cargar foto')),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(rootContext);
+                    },
+                    child: Text('Cancelar'),
+                  ),
+                  FilledButton(
+                    onPressed: () async {
+                      final isValid = firestore.validateTextField();
+                      if (firestore.imageToUpload == null){
+                        generalerror = 'No hay imagen';
+                        debugPrint('Entro el condicional');
+                        return;
+                      }
+                      if (!isValid) return;
+
+                      await firestore.uploadImage();
+                      firestore.setLoading(true);
+                      await firestore.addProduct();
+                      firestore.setLoading(false);
+                      firestore.setUploaded(true);
+                    },
+                    child: Text('Añadir'),
+                  ),
+                ],
+              );
+            });
           },
         );
       },
@@ -211,42 +210,31 @@ class ProductsClientProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  void openDialogSignout(BuildContext context){
-
+  void openDialogSignout(BuildContext context) {
     final firebase = context.read<FirebaseAuthProvider>();
 
     showDialog(
       barrierDismissible: false,
-      context: context, 
+      context: context,
       builder: (context) => AlertDialog(
-
         content: Text('¿Desea cerrar sesión?'),
         actions: [
           TextButton(
-            onPressed: (){
-              Navigator.of(context).pop();
-            }, 
-            child: Text('Cancelar')),
-
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancelar')),
           FilledButton(
-            onPressed: (){
-              firebase.signOut();
-              Navigator.of(context).pop();
-              firebase.clearData();
-              selectedIndex = 0;
-            }, 
-            child: Text('Aceptar')
-          )
+              onPressed: () {
+                firebase.signOut();
+                Navigator.of(context).pop();
+                firebase.clearData();
+                selectedIndex = 0;
+              },
+              child: Text('Aceptar'))
         ],
-      )
+      ),
     );
     notifyListeners();
   }
-
-
-
-
-
-
-
 }

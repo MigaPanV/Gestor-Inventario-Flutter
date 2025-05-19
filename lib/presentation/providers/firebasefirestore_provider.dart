@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,8 +7,7 @@ import 'package:gestor_inventario/domain/entities/product.dart';
 import 'package:gestor_inventario/infrastructure/model/database_products_model.dart';
 import 'package:gestor_inventario/services/select_images.dart';
 
-class FirebasefirestoreProvider extends ChangeNotifier{
-
+class FirebasefirestoreProvider extends ChangeNotifier {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseStorage storage = FirebaseStorage.instance;
 
@@ -18,139 +16,185 @@ class FirebasefirestoreProvider extends ChangeNotifier{
 
   String nameProduct = '';
   String descriptionProduct = '';
-  String imageurl = '' ;
-  int stockProduct = 0;
-  int priceProduct = 0;
+  String imageurl = '';
 
+  String priceInput = '';
+  String stockInput = '';
+
+  int? stockProduct;
+  int? priceProduct;
   File? imageToUpload;
 
-  String? errorgeneral;
+  String? errorName;
+  String? errorDescription;
+  String? errorPrice;
+  String? errorStock;
+  String? errorImage;
 
-  void clearData(){
-
+  void clearData() {
     nameProduct = '';
     descriptionProduct = '';
-    imageurl = '' ;
-    stockProduct = 0;
-    priceProduct = 0;
+    imageurl = '';
+    priceInput = '';
+    stockInput = '';
+    stockProduct = null;
+    priceProduct = null;
+    errorName = null;
+    errorDescription = null;
+    errorPrice = null;
+    errorStock = null;
+    errorImage = null;
     notifyListeners();
-
   }
 
-  bool validateTextField(){
-    if (nameProduct.isEmpty || descriptionProduct.isEmpty ) {
-      errorgeneral = 'Los campos no pueden estar vacíos';
-      notifyListeners();
-      return false;
+  bool validateTextField() {
+    bool isValid = true;
+
+    if (nameProduct.isEmpty) {
+      errorName = 'El nombre es obligatorio';
+      isValid = false;
+    } 
+    else {
+      errorName = null;
     }
-    errorgeneral = null;
-    return true;
+
+    if (descriptionProduct.isEmpty) {
+      errorDescription = 'La descripción es obligatoria';
+      isValid = false;
+    } 
+    else {
+      errorDescription = null;
+    }
+
+    if (priceInput.isEmpty) {
+      errorPrice = 'El precio es obligatorio';
+      isValid = false;
+    } 
+    else if (int.tryParse(priceInput) == null) {
+      errorPrice = 'No es un valor numérico';
+      isValid = false;
+    } 
+    else {
+      errorPrice = null;
+      priceProduct = int.parse(priceInput);
+    }
+
+    if (stockInput.isEmpty) {
+      errorStock = 'El stock es obligatorio';
+      isValid = false;
+    } 
+    else if (int.tryParse(stockInput) == null) {
+      errorStock = 'No es un valor numérico';
+      isValid = false;
+    } 
+    else {
+      errorStock = null;
+      stockProduct = int.parse(stockInput);
+    }
+
+    notifyListeners();
+    return isValid;
   }
-  
-  void getName(String value){
+
+  void getName(String value) {
     nameProduct = value;
+    errorName = null;
     notifyListeners();
   }
 
-  void getDescription(String value){
+  void getDescription(String value) {
     descriptionProduct = value;
+    errorDescription = null;
     notifyListeners();
   }
 
-  void getPrice(String value){
-    priceProduct = int.parse(value);
-    notifyListeners();
-  }
-  
-  void getStock(String value){
-    stockProduct = int.parse(value);
+  void getPrice(String value) {
+    priceInput = value;
+    priceProduct = int.tryParse(value);
+    errorPrice = null;
     notifyListeners();
   }
 
-  void getUrl(String value){
+  void getStock(String value) {
+    stockInput = value;
+    stockProduct = int.tryParse(value);
+    errorStock = null;
+    notifyListeners();
+  }
+
+  void getUrl(String value) {
     imageurl = value;
+    errorImage = null;
     notifyListeners();
   }
-  
+
   void setLoading(bool value) {
-  isLoading = value;
-  notifyListeners();
-}
+    isLoading = value;
+    notifyListeners();
+  }
 
-void setUploaded(bool value) {
-  isUploaded = value;
-  notifyListeners();
-}
+  void setUploaded(bool value) {
+    isUploaded = value;
+    notifyListeners();
+  }
 
-  Future<void> addProduct() async{
+  Future<void> addProduct() async {
     isUploaded = false;
     isLoading = false;
 
-    final product = DatabaseProductsModel(
-      nameProduct: nameProduct, 
-      descriptionProduct: descriptionProduct, 
-      imageurl: imageurl,
-      stockProduct: stockProduct,
-      priceProduct: priceProduct
-      );
-    
-    try{
+    if (!validateTextField()) return;
 
+    final product = DatabaseProductsModel(
+      nameProduct: nameProduct,
+      descriptionProduct: descriptionProduct,
+      imageurl: imageurl,
+      stockProduct: stockProduct!,
+      priceProduct: priceProduct!,
+    );
+
+    try {
       isLoading = true;
+      notifyListeners();
       await firestore.collection('productos').doc(nameProduct).set(product.tofirebase());
       debugPrint('producto añadido');
-      isLoading = false;
       isUploaded = true;
-
-    }on FirebaseException catch (e){
+    } 
+    on FirebaseException catch (e) {
       debugPrint(e.code);
+    } 
+    finally {
+      isLoading = false;
+      notifyListeners();
     }
-    isLoading = false;
-    notifyListeners();
   }
 
-  Future<List<Product>> getProducts() async{
-
+  Future<List<Product>> getProducts() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('productos').get();
-
-    return querySnapshot.docs.map((doc) => DatabaseProductsModel.fromFirestore(doc.data() as Map<String, dynamic>).toProductEntity()).toList();
+    return querySnapshot.docs
+        .map((doc) => DatabaseProductsModel.fromFirestore(doc.data() as Map<String, dynamic>).toProductEntity())
+        .toList();
   }
 
-  Future<void> getImage() async{
-
+  Future<void> getImage() async {
     final image = await getImages();
-    imageToUpload = File(image!.path);
-    notifyListeners();
+    if (image != null) {
+      imageToUpload = File(image.path);
+      notifyListeners();
+    }
   }
 
-  Future<bool> uploadImage() async{
-
-    debugPrint('$imageToUpload');
+  Future<bool> uploadImage() async {
+    if (imageToUpload == null) return false;
 
     final String nameFile = imageToUpload!.path.split('/').last;
-
     final Reference ref = storage.ref().child('images').child(nameFile);
-    
     final UploadTask uploadTask = ref.putFile(imageToUpload!);
-    
-    debugPrint('$uploadTask');
 
     final TaskSnapshot snapshot = await uploadTask.whenComplete(() => true);
-    
-    debugPrint('$snapshot');
-
     final String url = await snapshot.ref.getDownloadURL();
 
     getUrl(url);
 
-    debugPrint(url);
-    notifyListeners();
-
-    if(snapshot.state == TaskState.success){
-      return true;
-    }
-    return false;
+    return snapshot.state == TaskState.success;
   }
-
-
 }
