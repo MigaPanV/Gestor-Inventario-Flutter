@@ -210,8 +210,8 @@ class ProductsClientProvider extends ChangeNotifier{
                       }
                       if (!isValid) return;
 
-                      await firestore.uploadImage();
                       firestore.setLoading(true);
+                      await firestore.uploadImage();
                       firestore.generateSKU(firestore.nameProduct);
                       await firestore.addProduct();
                       firestore.setLoading(false);
@@ -299,8 +299,10 @@ class ProductsClientProvider extends ChangeNotifier{
                     child: Text('Cancelar')),
                   FilledButton(
                     onPressed: () async{
+                      firestore.setLoading(true);
                       await firestore.deleteProduct(dialogContext, product);
-                      Navigator.pop(dialogContext);
+                      firestore.setLoading(false);
+                      firestore.setUploaded(true);
                     }, 
                     child: Text('Eliminar'))
                 ],
@@ -381,13 +383,13 @@ class ProductsClientProvider extends ChangeNotifier{
               children: [
                 CustomTextField(
                   onChanged: firestore.getNewName,
-                  errorText: firestore.errorgeneral,
+                  errorText: null,
                   labeltext: 'Nombre del producto',
                   controller: nameController,
                 ),
                 CustomTextField(
                   onChanged: firestore.getNewDescription,
-                  errorText: firestore.errorgeneral,
+                  errorText: null,
                   labeltext: 'Descripción del producto',
                   controller: descriptionController,
 
@@ -408,7 +410,6 @@ class ProductsClientProvider extends ChangeNotifier{
                 FilledButton(
                   onPressed: ()async{
                     await firestore.getImage(); 
-
                   }, 
                   child: Text('Actualizar foto')
                 )
@@ -424,6 +425,8 @@ class ProductsClientProvider extends ChangeNotifier{
               FilledButton(
                 onPressed: () async {
                   
+                  firestore.setLoading(true);
+
                   if(firestore.imageToUpload == null) {
                     firestore.imageurl = product.imageurl;
                   }else{
@@ -436,6 +439,10 @@ class ProductsClientProvider extends ChangeNotifier{
                   firestore.getPrice(priceController.text);
 
                   await firestore.setProduct(dialogContext, product);
+                      
+                  firestore.setLoading(false);
+                  firestore.setUploaded(true);
+                    
                   
                 },
                 child: Text('Actualizar'),
@@ -465,8 +472,8 @@ class ProductsClientProvider extends ChangeNotifier{
               },
               child: Text('Cancelar')),
           FilledButton(
-              onPressed: () {
-                firebase.signOut();
+              onPressed: () async{
+                await firebase.signOut();
                 Navigator.of(context).pop();
                 firebase.clearData();
                 selectedIndex = 0;
