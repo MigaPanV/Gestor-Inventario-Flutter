@@ -6,6 +6,8 @@ import 'package:gestor_inventario/infrastructure/model/database_products_model.d
 import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
 import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/widgets/shared/custom_text_field.dart';
+import 'package:gestor_inventario/services/select_images.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class ProductsClientProvider extends ChangeNotifier{
@@ -166,11 +168,13 @@ class ProductsClientProvider extends ChangeNotifier{
                           errorText: null,
                           labeltext: 'Stock del producto',
                         ),
-                        CustomTextField(
-                          onChanged: firestore.getUrl,
-                          errorText: firestore.errorgeneral,
-                          labeltext: 'Url de la imagen del producto',
-                        ),
+                        SizedBox(height: 20),
+                        FilledButton(
+                          onPressed: ()async{
+                            await firestore.getImage();
+                          }, 
+                          child: Text('Cargar foto')
+                        )
                       ],
                     ),
                   ),
@@ -184,10 +188,16 @@ class ProductsClientProvider extends ChangeNotifier{
                     FilledButton(
                       onPressed: () async {
 
-                        
+                        if(firestore.imageToUpload == null){
+                            debugPrint('path: ${firestore.imageToUpload}');
+                            return;
+                        } 
+                        await firestore.uploadImage();
                         if (firestore.validateTextField()) {
                           firestore.setLoading(true);
                           await firestore.addProduct();
+                          
+                          
                           firestore.setLoading(false);
                           firestore.setUploaded(true);
                         }

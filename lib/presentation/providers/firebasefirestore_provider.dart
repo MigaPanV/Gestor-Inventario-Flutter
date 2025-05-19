@@ -1,12 +1,17 @@
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gestor_inventario/domain/entities/product.dart';
 import 'package:gestor_inventario/infrastructure/model/database_products_model.dart';
+import 'package:gestor_inventario/services/select_images.dart';
 
 class FirebasefirestoreProvider extends ChangeNotifier{
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseStorage storage = FirebaseStorage.instance;
 
   bool isLoading = false;
   bool isUploaded = false;
@@ -16,6 +21,8 @@ class FirebasefirestoreProvider extends ChangeNotifier{
   String imageurl = '' ;
   int stockProduct = 0;
   int priceProduct = 0;
+
+  File? imageToUpload;
 
   String? errorgeneral;
 
@@ -31,7 +38,7 @@ class FirebasefirestoreProvider extends ChangeNotifier{
   }
 
   bool validateTextField(){
-    if (nameProduct.isEmpty || descriptionProduct.isEmpty || imageurl.isEmpty) {
+    if (nameProduct.isEmpty || descriptionProduct.isEmpty ) {
       errorgeneral = 'Los campos no pueden estar vacíos';
       notifyListeners();
       return false;
@@ -90,7 +97,7 @@ void setUploaded(bool value) {
     try{
 
       isLoading = true;
-      await firestore.collection('productos').add( product.tofirebase() );
+      await firestore.collection('productos').doc(nameProduct).set(product.tofirebase());
       debugPrint('producto añadido');
       isLoading = false;
       isUploaded = true;
@@ -105,8 +112,44 @@ void setUploaded(bool value) {
   Future<List<Product>> getProducts() async{
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('productos').get();
-    
+
     return querySnapshot.docs.map((doc) => DatabaseProductsModel.fromFirestore(doc.data() as Map<String, dynamic>).toProductEntity()).toList();
+  }
+
+  Future<void> getImage() async{
+
+    final image = await getImages();
+    imageToUpload = File(image!.path);
+    notifyListeners();
+  }
+
+  Future<bool> uploadImage() async{
+
+    debugPrint('$imageToUpload');
+
+    final String nameFile = imageToUpload!.path.split('/').last;
+
+    final Reference ref = storage.ref().child('images').child(nameFile);
+    
+    final UploadTask uploadTask = ref.putFile(imageToUpload!);
+    
+    debugPrint('$uploadTask');
+
+    final TaskSnapshot snapshot = await uploadTask.whenComplete(() => true);
+    
+    debugPrint('$snapshot');
+
+    final String url = await snapshot.ref.getDownloadURL();
+
+    getUrl(url);
+
+    debugPrint(url);
+    notifyListeners();
+
+    if(snapshot.state == TaskState.success){
+      return true;
+    }
+    return false;
   }
 
 
