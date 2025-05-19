@@ -41,10 +41,11 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 162, 201, 219)),
             ),
-            home: AdminHomeScreen() //authProvider.user != null ? ClientScreen() : AuthScreen(),
+            home: authProvider.user == null 
+            ? AuthScreen() 
+            : authProvider.user != null && authProvider.role == 'Cliente' ? ClientScreen() : AdminHomeScreen(),
           );
         },
-
       ),
     );
   }

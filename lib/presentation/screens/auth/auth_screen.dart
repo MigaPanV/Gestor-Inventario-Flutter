@@ -87,6 +87,7 @@ class AuthScreen extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         authProvider.clearData();
+                        authProvider.role = 'Administrador';
                         Navigator.push(context, MaterialPageRoute<void>(
                         builder: (BuildContext context) => const RegisterScreen()));
                         

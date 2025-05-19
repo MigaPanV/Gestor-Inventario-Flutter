@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +7,9 @@ class FirebaseAuthProvider extends ChangeNotifier{
   User? user;
 
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  String role = '';
   String? emaillError;
   String? passwordError;
 
@@ -62,10 +65,15 @@ class FirebaseAuthProvider extends ChangeNotifier{
     
     try{
 
-      await auth.signInWithEmailAndPassword(
+      final userCredential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password
       );
+
+      if(userCredential.user != null){
+        String? rol = await getUserRole(userCredential.user!.uid);
+        role = rol!;
+      }
       userAuthStatus();
       
     }on FirebaseAuthException catch (e) {
@@ -89,10 +97,13 @@ class FirebaseAuthProvider extends ChangeNotifier{
     isLoading = true;
 
     try{
-      await auth.createUserWithEmailAndPassword(
+      final credentialUser = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password
       );
+      if(credentialUser.user != null ){
+        assignUserRole(credentialUser.user!.uid, role, credentialUser.user!.email!);
+      }
       isLoading = false;
       isUploaded = true;
       
@@ -136,5 +147,39 @@ class FirebaseAuthProvider extends ChangeNotifier{
     email = '';
     
     notifyListeners();
+  }
+
+  Future<void> assignUserRole(String uId, String rol, String email) async{
+    
+    try{
+      await firestore.collection('Usuarios').doc(uId).set({
+        'correo': email,
+        'rol': rol
+      });
+    }on FirebaseException catch(e){
+      debugPrint(e.code);
+    }
+    debugPrint('Rol $rol asigando a $uId');
+  }
+
+  Future<String?> getUserRole(String uid) async{
+
+    try{
+
+      DocumentSnapshot userDoc = await firestore.collection('Usuarios').doc(uid).get();
+
+      if(userDoc.exists){
+        return userDoc.get('rol');
+      }
+      else {
+        debugPrint('Documento de usuario no encontrado para UID: $uid');
+        return null;
+      }
+
+    }on FirebaseException catch(e){
+      debugPrint(e.code);
+      return null;
+    }
+    
   }
 }
