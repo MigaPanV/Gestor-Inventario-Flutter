@@ -18,7 +18,9 @@ class AdminHomeScreen extends StatelessWidget {
         appBar: AppBar(
       leading: IconButton(
         onPressed: () {
+          
           productProvider.openDialogSignout(context);
+
         },
         icon: Icon(Icons.door_back_door_outlined),
       ),
