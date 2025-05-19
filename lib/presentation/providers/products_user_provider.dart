@@ -204,9 +204,11 @@ class ProductsClientProvider extends ChangeNotifier{
                   FilledButton(
                     onPressed: () async {
                       final isValid = firestore.validateTextField();
-                      if (firestore.imageToUpload == null){
+                      if (firestore.imageToUpload == null) {
+                        setState((){
                         generalerror = 'No hay imagen';
-                        return;
+                        });
+                      return;
                       }
                       if (!isValid) return;
 

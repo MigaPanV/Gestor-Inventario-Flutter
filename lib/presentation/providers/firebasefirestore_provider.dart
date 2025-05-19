@@ -114,14 +114,34 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     notifyListeners();
   }
   void getNewStock(String value){
-    newStockProduct = int.parse(value);
-    notifyListeners();
+  final parsedValue = int.tryParse(value);
+  if (parsedValue != null) {
+    newStockProduct = parsedValue;
+  } else {
+    errorStock = 'El valor del stock no es numérico';
   }
-  void getnewprice(String value){
-    newPriceProduct = int.parse(value);
-    notifyListeners();
+  notifyListeners();
+}
+
+void getnewprice(String value){
+  final parsedValue = int.tryParse(value);
+  if (parsedValue != null) {
+    newPriceProduct = parsedValue;
+  } else {
+    errorPrice = 'El valor del precio no es numérico';
   }
+  notifyListeners();
+}
   
+  void loadProductToEdit(Product product) {
+  newNameProduct = product.nameProduct;
+  newDescriptionProduct = product.descriptionProduct;
+  newPriceProduct = product.priceProduct;
+  newStockProduct = product.stockProduct;
+  imageurl = product.imageurl;
+  notifyListeners();
+}
+
   void getName(String value){
     nameProduct = value;
     errorName = null;
