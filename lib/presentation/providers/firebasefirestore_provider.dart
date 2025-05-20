@@ -154,7 +154,18 @@ class FirebasefirestoreProvider extends ChangeNotifier {
   } else {
     errorName = null;
   }
-  final priceValue = double.tryParse(price ?? '');
+  if (description == null || description.trim().isEmpty) {
+    errorDescription = 'Descripcion no puede estar vacío';
+    isValid = false;
+  } else {
+    errorDescription = null;
+  }
+
+  if (price == null || price.trim().isEmpty) {
+  errorPrice = 'El campo de precio no puede estar vacío';
+  isValid = false;
+} else {
+  final priceValue = int.tryParse(price.trim());
   if (priceValue == null) {
     errorPrice = 'Debe ser un número válido';
     isValid = false;
@@ -164,8 +175,13 @@ class FirebasefirestoreProvider extends ChangeNotifier {
   } else {
     errorPrice = null;
   }
+}
 
-  final stockValue = int.tryParse(stock ?? '');
+  if (stock == null || stock.trim().isEmpty) {
+  errorStock = 'El campo stock no puede estar vacío';
+  isValid = false;
+} else {
+  final stockValue = int.tryParse(stock.trim());
   if (stockValue == null) {
     errorStock = 'Debe ser un número válido';
     isValid = false;
@@ -175,6 +191,7 @@ class FirebasefirestoreProvider extends ChangeNotifier {
   } else {
     errorStock = null;
   }
+}
 
   notifyListeners();
   return isValid;

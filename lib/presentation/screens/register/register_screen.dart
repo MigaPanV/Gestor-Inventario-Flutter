@@ -119,6 +119,7 @@ class RegisterScreen extends StatelessWidget {
                     
                                 if(registerProvider.validateTextField()){
                                   await registerProvider.register(registerProvider.email, registerProvider.password);
+                                  await registerProvider.signOut();
                                 }
                                 
                               },
