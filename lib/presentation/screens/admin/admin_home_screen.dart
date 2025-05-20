@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gestor_inventario/presentation/providers/firebaseauth_provider.dart';
 import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
