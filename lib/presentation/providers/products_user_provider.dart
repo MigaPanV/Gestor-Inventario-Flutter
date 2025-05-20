@@ -466,7 +466,7 @@ class ProductsClientProvider extends ChangeNotifier{
       barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
-        content: Text('¿Desea cerrar sesión?'),
+        title: Text('¿Desea cerrar sesión?'),
         actions: [
           TextButton(
               onPressed: () {
@@ -483,6 +483,109 @@ class ProductsClientProvider extends ChangeNotifier{
               child: Text('Aceptar'))
         ],
       ),
+    );
+    notifyListeners();
+  }
+
+  void openAddAdmin(BuildContext context){
+
+    showDialog(
+      barrierDismissible: false,
+      context: context, 
+      builder: (dialogContext) {
+        return Consumer<FirebaseAuthProvider> (
+          builder: (context, auth, _) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+
+                if (auth.isLoading) {
+                  return AlertDialog(
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text('Agregando administrador', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                        )
+                      ],
+                    ),
+                  );
+                }
+
+                if (!auth.isLoading && auth.isUploaded) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Administrador agregado',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(Icons.check_circle, color: Colors.green, size: 40),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          
+                          auth.isUploaded = false;
+                          Navigator.pop(dialogContext);
+                        },
+                        child: Text('Continuar'),
+                      )
+                    ],
+                  ),
+                );
+              }
+                return AlertDialog(
+                  title: Text('Registrar administrador'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CustomTextField(
+                        errorText: auth.emaillError,
+                        onChanged: auth.getEmail,
+                        labeltext: 'Correo'
+                      ),
+                      CustomTextField(
+                        errorText: auth.passwordError,
+                        onChanged: auth.getPassword,
+                        obscureText: true,
+                        labeltext: 'Contraseña'
+                      )
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: (){
+                        Navigator.pop(dialogContext);
+                      }, 
+                      child: Text('Cancelar')
+                    ),
+                    FilledButton(
+                      onPressed: () async{
+                        if(auth.validateTextField()){
+                          await auth.register(auth.email, auth.password);
+                        }
+                        
+                      }, 
+                      child: Text('Registrar')
+                    )
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
     );
     notifyListeners();
   }
