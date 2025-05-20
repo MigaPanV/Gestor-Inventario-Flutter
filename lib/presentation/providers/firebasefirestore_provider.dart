@@ -398,4 +398,22 @@ void getnewprice(String value){
     notifyListeners();
   }
 
+  Future<void> updateStockAfterPurchase(String sku, int cantidad) async{
+    final docRef = firestore.collection('productos').doc(sku);
+
+    try{
+
+      final docSnapshot = await docRef.get();
+
+      if(docSnapshot.exists){
+        int stockActual = docSnapshot.get('stock');
+        int nuevoStock = stockActual - cantidad;
+        if(nuevoStock < 0) nuevoStock = 0;
+        await docRef.update({'stock' : nuevoStock});
+      }
+
+    }on FirebaseException catch(e){
+      debugPrint(e.code);
+    }
+  }
 }

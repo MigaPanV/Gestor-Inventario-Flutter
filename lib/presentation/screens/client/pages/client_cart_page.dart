@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -167,6 +168,21 @@ class ClientCartPage extends StatelessWidget {
             ],
           ),
         ),
+        floatingActionButton: productCartProvider.listCart.isEmpty 
+        ? FloatingActionButton(onPressed: null) 
+        : FloatingActionButton(
+          onPressed: (){
+
+            final firestorePorvider = context.read<FirebasefirestoreProvider>();
+            final cart = productCartProvider.listCart;
+
+            for(var item in cart){
+              firestorePorvider.updateStockAfterPurchase(item.sku, item.cantidadAgregada);
+            }
+            productCartProvider.clearCart();
+          },
+          child: Icon(Icons.shopping_bag)
+        )
       )
     );
   }

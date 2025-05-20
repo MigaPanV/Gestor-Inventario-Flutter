@@ -616,4 +616,8 @@ class ProductsClientProvider extends ChangeNotifier{
       )
     );
   }
+  void clearCart(){
+    listCart.clear();
+    notifyListeners();
+  }
 }
