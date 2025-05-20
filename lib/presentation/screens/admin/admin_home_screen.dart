@@ -16,20 +16,38 @@ class AdminHomeScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-      leading: IconButton(
-        onPressed: () {
-          
-          productProvider.openDialogSignout(context);
+          leading: IconButton(
+            tooltip: 'Cerrar sesión',
+            onPressed: () {
+              
+              productProvider.openDialogSignout(context);
 
-        },
-        icon: Icon(Icons.door_back_door_outlined),
-      ),
-      centerTitle: true,
-      title: Text(
-        'Inventario',
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-      ),
-    ),
+            },
+            icon: Icon(Icons.door_back_door_outlined),
+          ),
+          centerTitle: true,
+          title: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Inventario',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                ),
+              ),
+              IconButton(
+                onPressed: (){}, 
+                icon: Icon(Icons.account_circle_outlined)
+              ),
+              IconButton(
+                tooltip: 'Añadir adminsitrador',
+                onPressed: (){
+                  productProvider.openAddAdmin(context);
+                }, 
+                icon: Icon(Icons.supervised_user_circle_outlined))
+            ],
+          ),
+
+        ),
         body: Padding(
           padding: const EdgeInsets.all(20),
           child: productProvider.listProduct.isEmpty ? Column(
@@ -103,6 +121,7 @@ class AdminHomeScreen extends StatelessWidget {
                               ),
 
                               IconButton(
+                                tooltip: 'Editar producto',
                                 onPressed: () {
                                   final provider = context.read<FirebasefirestoreProvider>();
                                   provider.loadProductToEdit(product);
@@ -122,10 +141,12 @@ class AdminHomeScreen extends StatelessWidget {
                                   children: [
                                     Expanded(child: Text('\$${product.priceProduct}')),
                                     IconButton(
-                                    onPressed: () {
-                                      productProvider.openDeleteProduct(context, product);
-                                    },
-                                    icon: Icon(Icons.delete)),
+                                      tooltip: 'Eliminar producto',
+                                      onPressed: () {
+                                        productProvider.openDeleteProduct(context, product);
+                                      },
+                                      icon: Icon(Icons.delete)
+                                    ),
                                     SizedBox(width: 2)
                                   ],
                                 ),
@@ -145,6 +166,7 @@ class AdminHomeScreen extends StatelessWidget {
             ],
           ) ),
         floatingActionButton: FloatingActionButton(
+          tooltip: 'Añadir producto',
           onPressed: () {
             firestoreProvider.clearData();
             productProvider.openDialogAddProduct(context);
