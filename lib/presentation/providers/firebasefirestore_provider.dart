@@ -105,6 +105,80 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     return isValid;
   }
 
+  bool validateEditFields() {
+    bool isValid = true;
+
+    if (newNameProduct.isEmpty) {
+      errorName = 'El nombre es obligatorio';
+      isValid = false;
+    } else {
+      errorName = null;
+    }
+
+    if (newDescriptionProduct.isEmpty) {
+      errorDescription = 'La descripción es obligatoria';
+      isValid = false;
+    } else {
+      errorDescription = null;
+    }
+
+    if (newPriceProduct <= 0) {
+      errorPrice = 'El precio debe ser un número positivo';
+      isValid = false;
+    } else {
+      errorPrice = null;
+    }
+
+    if (newStockProduct < 0) {
+      errorStock = 'El stock no puede ser negativo';
+      isValid = false;
+    } else {
+      errorStock = null;
+    }
+
+    notifyListeners();
+    return isValid;
+  }
+
+  bool validateUpdateFields({
+    required String? name,
+    required String? description,
+    required String? price,
+    required String? stock,
+}) {
+  bool isValid = true;
+
+  if (name == null || name.trim().isEmpty) {
+    errorName = 'Nombre no puede estar vacío';
+    isValid = false;
+  } else {
+    errorName = null;
+  }
+  final priceValue = double.tryParse(price ?? '');
+  if (priceValue == null) {
+    errorPrice = 'Debe ser un número válido';
+    isValid = false;
+  } else if (priceValue < 0) {
+    errorPrice = 'Debe ser un número positivo';
+    isValid = false;
+  } else {
+    errorPrice = null;
+  }
+
+  final stockValue = int.tryParse(stock ?? '');
+  if (stockValue == null) {
+    errorStock = 'Debe ser un número válido';
+    isValid = false;
+  } else if (stockValue < 0) {
+    errorStock = 'Debe ser un número positivo';
+    isValid = false;
+  } else {
+    errorStock = null;
+  }
+
+  notifyListeners();
+  return isValid;
+}
   void getNewName(String value){
     newNameProduct = value;
     notifyListeners();
@@ -279,6 +353,8 @@ void getnewprice(String value){
     isUploaded = false;
     isLoading = false;
     final clientProvider = context.read<ProductsClientProvider>();
+
+    if (!validateEditFields()) return;
 
     final newProduct = DatabaseProductsModel(
       nameProduct: newNameProduct, 
