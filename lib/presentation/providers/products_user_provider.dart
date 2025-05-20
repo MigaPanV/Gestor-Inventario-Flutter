@@ -385,26 +385,26 @@ class ProductsClientProvider extends ChangeNotifier{
               children: [
                 CustomTextField(
                   onChanged: firestore.getNewName,
-                  errorText: null,
+                  errorText: firestore.errorName,
                   labeltext: 'Nombre del producto',
                   controller: nameController,
                 ),
                 CustomTextField(
                   onChanged: firestore.getNewDescription,
-                  errorText: null,
+                  errorText: firestore.errorDescription,
                   labeltext: 'Descripción del producto',
                   controller: descriptionController,
 
                 ),
                 CustomTextField(
                   onChanged: firestore.getnewprice,
-                  errorText: null,
+                  errorText: firestore.errorPrice,
                   labeltext: 'Precio del producto',
                   controller: priceController,
                 ),
                 CustomTextField(
                   onChanged: firestore.getNewStock,
-                  errorText: null,
+                  errorText: firestore.errorStock,
                   labeltext: 'Stock del producto',
                   controller: stockController,
                 ),
@@ -426,37 +426,47 @@ class ProductsClientProvider extends ChangeNotifier{
               ),
               FilledButton(
                 onPressed: () async {
-                  
-                  firestore.setLoading(true);
+                  final name = nameController.text;
+                  final description = descriptionController.text;
+                  final price = priceController.text;
+                  final stock = stockController.text;
 
-                  if(firestore.imageToUpload == null) {
+                  final isValid = firestore.validateUpdateFields(
+                    name: name,
+                    description: description,
+                    price: price,
+                    stock: stock,
+                  );
+
+                  if (!isValid) {
+                    setState(() {});
+                    return;
+                  }
+                  firestore.setLoading(true);
+                  if (firestore.imageToUpload == null) {
                     firestore.imageurl = product.imageurl;
-                  }else{
+                  } else {
                     await firestore.uploadImage();
                   }
 
-                  firestore.getName(nameController.text);
-                  firestore.getDescription(descriptionController.text);
-                  firestore.getStock(stockController.text);
-                  firestore.getPrice(priceController.text);
+                  firestore.getName(name);
+                  firestore.getDescription(description);
+                  firestore.getStock(stock);
+                  firestore.getPrice(price);
 
                   await firestore.setProduct(dialogContext, product);
-                      
                   firestore.setLoading(false);
                   firestore.setUploaded(true);
-                    
-                  
-                },
-                child: Text('Actualizar'),
-              ),
-            ],
-
-          );}
-        );
-        }
-      )
-    );
-  }
+                  },
+                  child: Text('Actualizar'),
+                  ),
+                ],
+        );}
+      );
+      }
+    )
+  );
+}
 
   void openDialogSignout(BuildContext context){
 
