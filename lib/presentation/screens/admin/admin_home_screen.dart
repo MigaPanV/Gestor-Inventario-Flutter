@@ -35,7 +35,10 @@ class AdminHomeScreen extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: (){}, 
+                tooltip: 'Cuenta',
+                onPressed: (){
+                  productProvider.openInfoCount(context);
+                }, 
                 icon: Icon(Icons.account_circle_outlined)
               ),
               IconButton(
@@ -80,91 +83,86 @@ class AdminHomeScreen extends StatelessWidget {
                       clipBehavior: Clip.antiAlias,
                       color: product.stockProduct == 0 ? Colors.red[100] : null,
                       
-                      child: Column(
-
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Stack(
                         children: [
-                          
-                          Expanded(
-                            child: Image.network(
-
-                              product.imageurl,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-
-                              loadingBuilder: (context, child, loadingProgress) {
-
-                                if(loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                            ),
-                          ),
-                          
-                          SizedBox(height: 5),
-
-                          Row(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              
                               Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: Text(
-                                    product.nameProduct, 
-                                    style: TextStyle(   
-                                      fontWeight: FontWeight.bold, 
-                                      overflow: TextOverflow.ellipsis
-                                    ),
-                                    maxLines: 2
-                                  ),
+                                child: Image.network(
+                          
+                                  product.imageurl,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                          
+                                  loadingBuilder: (context, child, loadingProgress) {
+                          
+                                    if(loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
                                 ),
                               ),
-
-                              IconButton(
-                                tooltip: 'Editar producto',
-                                onPressed: () {
-                                  final provider = context.read<FirebasefirestoreProvider>();
-                                  provider.loadProductToEdit(product);
-                                  productProvider.openUpdateProduct(context, product);
-                                },
-                                icon: Icon(Icons.edit)),
-                              SizedBox(width: 10)
+                              
+                              SizedBox(height: 5),
+                          
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                child: Text(
+                                  product.nameProduct,
+                                  style: TextStyle( 
+                                    fontWeight: FontWeight.bold, 
+                                    overflow: TextOverflow.ellipsis
+                                  ),
+                                  maxLines: 2
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                child: Text('\$${product.priceProduct}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                child: Text('Stock: ${product.stockProduct}'),
+                              ),
                             ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [ 
-                                
-                                Row(
-                                  children: [
-                                    Expanded(child: Text('\$${product.priceProduct}')),
-                                    IconButton(
-                                      tooltip: 'Eliminar producto',
-                                      onPressed: () {
-                                        productProvider.openDeleteProduct(context, product);
-                                      },
-                                      icon: Icon(Icons.delete)
-                                    ),
-                                    SizedBox(width: 2)
-                                  ],
-                                ),
-                                Text('Stock: ${product.stockProduct}')
-                              ],
+
+                          Positioned(
+                            bottom: 50,
+                            right: 10,
+                            child: IconButton(
+                              tooltip: 'Editar producto',
+                              onPressed: () {
+                                final provider = context.read<FirebasefirestoreProvider>();
+                                provider.loadProductToEdit(product);
+                                productProvider.openUpdateProduct(context, product);
+                              },
+                              icon: Icon(Icons.edit)
                             ),
                           ),
-
-                          SizedBox(height: 10),
-                          
-                        ],
+                          Positioned(
+                            bottom: 10,
+                            right: 10,
+                            child: IconButton(
+                              tooltip: 'Eliminar producto',
+                              onPressed: () {
+                                productProvider.openDeleteProduct(context, product);
+                              },
+                              icon: Icon(Icons.delete)
+                            ),
+                          ),
+                        ]
                       ),
                     );
                   },
                 ) 
               ),
             ],
-          ) ),
+          ) 
+        ),
         floatingActionButton: FloatingActionButton(
           tooltip: 'Añadir producto',
           onPressed: () {

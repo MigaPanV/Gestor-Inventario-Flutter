@@ -61,8 +61,21 @@ class ClientScreen extends StatelessWidget {
                 color: Colors.grey,
               ),
               Expanded(
-                child: Container(
-                  child: page
+                child: Stack(
+                  children: [
+                    page,
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: IconButton(
+                        tooltip: 'Cuenta',
+                        onPressed: (){
+                          clientProvider.openInfoCount(context);
+                        }, 
+                        icon: Icon(Icons.account_circle_outlined)
+                      ),
+                    )
+                  ]
                 )
               )
             ],

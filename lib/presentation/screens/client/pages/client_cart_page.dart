@@ -119,8 +119,8 @@ class ClientCartPage extends StatelessWidget {
                             ],
                           ),
                           Positioned(
-                            bottom: 15,
-                            right: 5,
+                            bottom: 20,
+                            right: 13,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
@@ -139,7 +139,7 @@ class ClientCartPage extends StatelessWidget {
                             ),
                           Positioned(
                             bottom: 0,
-                            right: 5,
+                            right: 13,
                             child: GestureDetector(
                               onTap: () {
 

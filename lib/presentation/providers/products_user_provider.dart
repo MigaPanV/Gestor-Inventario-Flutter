@@ -131,7 +131,7 @@ class ProductsClientProvider extends ChangeNotifier{
                           Text(
                             'Datos cargados',
                             style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(width: 10),
                           Icon(Icons.check_circle,
@@ -272,7 +272,7 @@ class ProductsClientProvider extends ChangeNotifier{
                         children: [
                           Text(
                             'Datos eliminados',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(width: 10),
                           Icon(Icons.check_circle, color: Colors.green, size: 40),
@@ -328,27 +328,25 @@ class ProductsClientProvider extends ChangeNotifier{
       builder: (dialogContext) => Consumer<FirebasefirestoreProvider>(
         builder: (context, firestore, _) { 
           return StatefulBuilder(
-          builder: (context, setState) { 
-
-            if (firestore.isLoading) {
-                  return AlertDialog(
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text('Actualizando datos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                        )
-                      ],
-                    ),
-                  );
-                }
-
-                if (!firestore.isLoading && firestore.isUploaded) {
+            builder: (context, setState) { 
+              if (firestore.isLoading) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('Actualizando datos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                      )
+                    ],
+                  ),
+                );
+              }
+              if (!firestore.isLoading && firestore.isUploaded) {
                 return AlertDialog(
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -358,7 +356,7 @@ class ProductsClientProvider extends ChangeNotifier{
                         children: [
                           Text(
                             'Datos actualizados',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(width: 10),
                           Icon(Icons.check_circle, color: Colors.green, size: 40),
@@ -377,96 +375,98 @@ class ProductsClientProvider extends ChangeNotifier{
                   ),
                 );
               }
-
-            return AlertDialog(
-            
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomTextField(
-                  onChanged: firestore.getNewName,
-                  errorText: firestore.errorName,
-                  labeltext: 'Nombre del producto',
-                  controller: nameController,
+              return AlertDialog(
+                title: Text('Editar producto'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CustomTextField(
+                        onChanged: firestore.getNewName,
+                        errorText: firestore.errorName,
+                        labeltext: 'Nombre del producto',
+                        controller: nameController,
+                      ),
+                      CustomTextField(
+                        onChanged: firestore.getNewDescription,
+                        errorText: firestore.errorDescription,
+                        labeltext: 'Descripción del producto',
+                        controller: descriptionController,
+                  
+                      ),
+                      CustomTextField(
+                        onChanged: firestore.getnewprice,
+                        errorText: firestore.errorPrice,
+                        labeltext: 'Precio del producto',
+                        controller: priceController,
+                      ),
+                      CustomTextField(
+                        onChanged: firestore.getNewStock,
+                        errorText: firestore.errorStock,
+                        labeltext: 'Stock del producto',
+                        controller: stockController,
+                      ),
+                      SizedBox(height: 20),
+                      FilledButton(
+                        onPressed: ()async{
+                          await firestore.getImage(); 
+                        }, 
+                        child: Text('Actualizar foto')
+                      )
+                    ],
+                  ),
                 ),
-                CustomTextField(
-                  onChanged: firestore.getNewDescription,
-                  errorText: firestore.errorDescription,
-                  labeltext: 'Descripción del producto',
-                  controller: descriptionController,
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    child: Text('Cancelar'),
+                  ),
+                  FilledButton(
+                    onPressed: () async {
+                      final name = nameController.text;
+                      final description = descriptionController.text;
+                      final price = priceController.text;
+                      final stock = stockController.text;
 
-                ),
-                CustomTextField(
-                  onChanged: firestore.getnewprice,
-                  errorText: firestore.errorPrice,
-                  labeltext: 'Precio del producto',
-                  controller: priceController,
-                ),
-                CustomTextField(
-                  onChanged: firestore.getNewStock,
-                  errorText: firestore.errorStock,
-                  labeltext: 'Stock del producto',
-                  controller: stockController,
-                ),
-                SizedBox(height: 20),
-                FilledButton(
-                  onPressed: ()async{
-                    await firestore.getImage(); 
-                  }, 
-                  child: Text('Actualizar foto')
-                )
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                },
-                child: Text('Cancelar'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  final name = nameController.text;
-                  final description = descriptionController.text;
-                  final price = priceController.text;
-                  final stock = stockController.text;
+                      final isValid = firestore.validateUpdateFields(
+                        name: name,
+                        description: description,
+                        price: price,
+                        stock: stock,
+                      );
 
-                  final isValid = firestore.validateUpdateFields(
-                    name: name,
-                    description: description,
-                    price: price,
-                    stock: stock,
-                  );
+                      if (!isValid) {
+                        setState(() {});
+                        return;
+                      }
+                      firestore.setLoading(true);
+                      if (firestore.imageToUpload == null) {
+                        firestore.imageurl = product.imageurl;
+                      } else {
+                        await firestore.uploadImage();
+                      }
 
-                  if (!isValid) {
-                    setState(() {});
-                    return;
-                  }
-                  firestore.setLoading(true);
-                  if (firestore.imageToUpload == null) {
-                    firestore.imageurl = product.imageurl;
-                  } else {
-                    await firestore.uploadImage();
-                  }
+                      firestore.getName(name);
+                      firestore.getDescription(description);
+                      firestore.getStock(stock);
+                      firestore.getPrice(price);
 
-                  firestore.getName(name);
-                  firestore.getDescription(description);
-                  firestore.getStock(stock);
-                  firestore.getPrice(price);
-
-                  await firestore.setProduct(dialogContext, product);
-                  firestore.setLoading(false);
-                  firestore.setUploaded(true);
-                  },
-                  child: Text('Actualizar'),
+                      await firestore.setProduct(dialogContext, product);
+                      firestore.setLoading(false);
+                      firestore.setUploaded(true);
+                    },
+                    child: Text('Actualizar'),
                   ),
                 ],
-        );}
-      );
-      }
-    )
-  );
-}
+              );
+            }
+          );
+        }
+      )
+    );
+  }
 
   void openDialogSignout(BuildContext context){
 
@@ -598,5 +598,22 @@ class ProductsClientProvider extends ChangeNotifier{
       },
     );
     notifyListeners();
+  }
+
+  void openInfoCount(BuildContext context){
+    showDialog(
+      context: context, 
+      builder: (dialogContext) => Consumer<FirebaseAuthProvider>(
+        builder: (context, auth, _) => AlertDialog(
+          title: Text('Informacion de cuenta'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Correo: ${auth.user!.email}')
+            ],
+          ),
+        )
+      )
+    );
   }
 }
