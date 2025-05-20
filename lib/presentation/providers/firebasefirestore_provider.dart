@@ -44,6 +44,7 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     nameProduct = '';
     descriptionProduct = '';
     imageurl = '';
+    imageToUpload = null;
     priceInput = '';
     stockInput = '';
     stockProduct = null;
@@ -53,57 +54,59 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     errorPrice = null;
     errorStock = null;
     errorImage = null;
+    sku = '';
     notifyListeners();
   }
 
   bool validateTextField() {
-    bool isValid = true;
+  bool isValid = true;
 
-    if (nameProduct.isEmpty) {
-      errorName = 'El nombre es obligatorio';
-      isValid = false;
-    } 
-    else {
-      errorName = null;
-    }
-
-    if (descriptionProduct.isEmpty) {
-      errorDescription = 'La descripción es obligatoria';
-      isValid = false;
-    } 
-    else {
-      errorDescription = null;
-    }
-
-    if (priceInput.isEmpty) {
-      errorPrice = 'El precio es obligatorio';
-      isValid = false;
-    } 
-    else if (int.tryParse(priceInput) == null) {
-      errorPrice = 'No es un valor numérico';
-      isValid = false;
-    } 
-    else {
-      errorPrice = null;
-      priceProduct = int.parse(priceInput);
-    }
-
-    if (stockInput.isEmpty) {
-      errorStock = 'El stock es obligatorio';
-      isValid = false;
-    } 
-    else if (int.tryParse(stockInput) == null) {
-      errorStock = 'No es un valor numérico';
-      isValid = false;
-    } 
-    else {
-      errorStock = null;
-      stockProduct = int.parse(stockInput);
-    }
-
-    notifyListeners();
-    return isValid;
+  if (nameProduct.isEmpty) {
+    errorName = 'El nombre es obligatorio';
+    isValid = false;
+  } else {
+    errorName = null;
   }
+
+  if (descriptionProduct.isEmpty) {
+    errorDescription = 'La descripción es obligatoria';
+    isValid = false;
+  } else {
+    errorDescription = null;
+  }
+
+  if (priceInput.isEmpty) {
+    errorPrice = 'El precio es obligatorio';
+    isValid = false;
+  } else if (int.tryParse(priceInput) == null) {
+    errorPrice = 'No es un valor numérico';
+    isValid = false;
+  } else {
+    errorPrice = null;
+    priceProduct = int.parse(priceInput);
+  }
+
+  if (stockInput.isEmpty) {
+    errorStock = 'El stock es obligatorio';
+    isValid = false;
+  } else if (int.tryParse(stockInput) == null) {
+    errorStock = 'No es un valor numérico';
+    isValid = false;
+  } else {
+    errorStock = null;
+    stockProduct = int.parse(stockInput);
+  }
+
+  if (imageToUpload == null) {
+    errorImage = 'Debe seleccionar una imagen';
+    isValid = false;
+  } else {
+    errorImage = null;
+  }
+
+  notifyListeners();
+  return isValid;
+}
 
   bool validateEditFields() {
     bool isValid = true;

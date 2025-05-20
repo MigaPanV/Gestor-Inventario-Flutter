@@ -90,147 +90,159 @@ class ProductsClientProvider extends ChangeNotifier{
   }
 
   void openDialogAddProduct(BuildContext context) {
-    final rootContext = context;
-    String? generalerror = '';
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (dialogContext) {
-        return Consumer<FirebasefirestoreProvider>(
-          builder: (context, firestore, _) {
-            return StatefulBuilder(builder: (context, setState) {
-              if (firestore.isLoading) {
-                return AlertDialog(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text('Añadiendo datos',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w500)),
-                      )
-                    ],
-                  ),
-                );
-              }
-
-              if (!firestore.isLoading && firestore.isUploaded) {
-                final productProvider = context.read<ProductsClientProvider>();
-                return AlertDialog(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Datos cargados',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(width: 10),
-                          Icon(Icons.check_circle,
-                              color: Colors.green, size: 40),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          firestore.clearData();
-                          firestore.setUploaded(false);
-                          productProvider.addToList();
-                          Navigator.pop(dialogContext);
-                        },
-                        child: Text('Continuar'),
-                      )
-                    ],
-                  ),
-                );
-              }
-
+  final rootContext = context;
+  String? generalError = '';
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (dialogContext) {
+      return Consumer<FirebasefirestoreProvider>(
+        builder: (context, firestore, _) {
+          return StatefulBuilder(builder: (context, setState) {
+            if (firestore.isLoading) {
               return AlertDialog(
-                title: Column(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Añadir producto'),
-                    Text('$generalerror', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.w400),)
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text('Añadiendo datos',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500)),
+                    )
                   ],
                 ),
-                content: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CustomTextField(
-                        onChanged: firestore.getName,
-                        errorText: firestore.errorName,
-                        labeltext: 'Nombre del producto',
-                      ),
-                      CustomTextField(
-                        onChanged: firestore.getDescription,
-                        errorText: firestore.errorDescription,
-                        labeltext: 'Descripción del producto',
-                      ),
-                      CustomTextField(
-                        onChanged: firestore.getPrice,
-                        errorText: firestore.errorPrice,
-                        labeltext: 'Precio del producto',
-                      ),
-                      CustomTextField(
-                        onChanged: firestore.getStock,
-                        errorText: firestore.errorStock,
-                        labeltext: 'Stock del producto',
-                      ),
-                      SizedBox(height: 20),
-                      FilledButton(
-                          onPressed: () async {
-                            await firestore.getImage();
-                            debugPrint('${firestore.imageToUpload}');
-                          },
-                          child: Text('Cargar foto')),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(rootContext);
-                    },
-                    child: Text('Cancelar'),
-                  ),
-                  FilledButton(
-                    onPressed: () async {
-                      final isValid = firestore.validateTextField();
-                      if (firestore.imageToUpload == null) {
-                        setState((){
-                        generalerror = 'No hay imagen';
-                        });
-                      return;
-                      }
-                      if (!isValid) return;
-
-                      firestore.setLoading(true);
-                      await firestore.uploadImage();
-                      firestore.generateSKU(firestore.nameProduct);
-                      await firestore.addProduct();
-                      firestore.setLoading(false);
-                      firestore.setUploaded(true);
-                    },
-                    child: Text('Añadir'),
-                  ),
-                ],
               );
-            });
+            }
 
-          },
-        );
-      },
-    );
-    notifyListeners();
-  }
+            if (!firestore.isLoading && firestore.isUploaded) {
+              final productProvider = context.read<ProductsClientProvider>();
+              return AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Datos cargados',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: 10),
+                        Icon(Icons.check_circle,
+                            color: Colors.green, size: 40),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        firestore.clearData();
+                        firestore.setUploaded(false);
+                        productProvider.addToList();
+                        Navigator.pop(dialogContext);
+                      },
+                      child: Text('Continuar'),
+                    )
+                  ],
+                ),
+              );
+            }
+
+            return AlertDialog(
+              title: Column(
+                children: [
+                  Text('Añadir producto'),
+                  if (generalError.isNotEmpty)
+                    Text(
+                      generalError,
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  if (firestore.errorImage != null)
+                    Text(
+                      firestore.errorImage!,
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400),
+                    ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomTextField(
+                      onChanged: firestore.getName,
+                      errorText: firestore.errorName,
+                      labeltext: 'Nombre del producto',
+                    ),
+                    CustomTextField(
+                      onChanged: firestore.getDescription,
+                      errorText: firestore.errorDescription,
+                      labeltext: 'Descripción del producto',
+                    ),
+                    CustomTextField(
+                      onChanged: firestore.getPrice,
+                      errorText: firestore.errorPrice,
+                      labeltext: 'Precio del producto',
+                    ),
+                    CustomTextField(
+                      onChanged: firestore.getStock,
+                      errorText: firestore.errorStock,
+                      labeltext: 'Stock del producto',
+                    ),
+                    SizedBox(height: 20),
+                    FilledButton(
+                        onPressed: () async {
+                          await firestore.getImage();
+                          setState(() {});
+                        },
+                        child: Text('Cargar foto')),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(rootContext);
+                  },
+                  child: Text('Cancelar'),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    final isValid = firestore.validateTextField();
+                    if (!isValid) {
+                      setState(() {});
+                      return;
+                    }
+
+                    firestore.setLoading(true);
+                    await firestore.uploadImage();
+                    firestore.generateSKU(firestore.nameProduct);
+                    await firestore.addProduct();
+                    firestore.setLoading(false);
+                    firestore.setUploaded(true);
+                    setState(() {});
+                  },
+                  child: Text('Añadir'),
+                ),
+              ],
+            );
+          });
+        },
+      );
+    },
+  );
+  notifyListeners();
+}
 
   void openDeleteProduct(BuildContext context, Product product){
 
