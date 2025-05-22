@@ -707,7 +707,7 @@ class ProductsUserProvider extends ChangeNotifier{
   }
   void openCheckOut(BuildContext context){
 
-    showDialog(
+    showDialog(barrierDismissible: false,
       context: context, 
       builder: (dialogContext) {
         return Consumer<FirebasefirestoreProvider>(
@@ -805,7 +805,7 @@ class ProductsUserProvider extends ChangeNotifier{
 
   void refresh(BuildContext context){
 
-    showDialog(
+    showDialog(barrierDismissible: false,
       context: context, 
       builder: (context) => AlertDialog(
         content: Column(
