@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/config/helpers/human_formats.dart';
 import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
@@ -139,11 +140,11 @@ class AdminHomeScreen extends StatelessWidget {
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                child: Text('\$${product.priceProduct}'),
+                                child: Text('\$${ HumanFormats.humanReadbleNumber( product.priceProduct )}'),
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                child: Text('Stock: ${product.stockProduct}'),
+                                child: Text('Stock: ${ HumanFormats.humanReadbleNumber( product.stockProduct )}'),
                               ),
                             ],
                           ),

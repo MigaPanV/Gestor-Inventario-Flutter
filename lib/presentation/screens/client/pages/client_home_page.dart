@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/config/helpers/human_formats.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -112,8 +113,8 @@ class ClientHomePage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [ 
-                                Text('\$${product.priceProduct}'),
-                                Text('Stock: ${product.stockProduct}')
+                                Text('\$${HumanFormats.humanReadbleNumber( product.priceProduct )}'),
+                                Text('Stock: ${ HumanFormats.humanReadbleNumber( product.stockProduct )}')
                               ],
                             ),
                           ),

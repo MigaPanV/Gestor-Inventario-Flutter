@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/config/helpers/human_formats.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -121,8 +122,8 @@ class ClientCartPage extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('\$${product.priceProduct * product.cantidadAgregada}'),
-                                    Text('Cantidad: ${product.cantidadAgregada}')
+                                    Text('\$${ HumanFormats.humanReadbleNumber( product.priceProduct * product.cantidadAgregada )}'),
+                                    Text('Cantidad: ${ HumanFormats.humanReadbleNumber( product.cantidadAgregada )}')
                                   ],
                                 ),
                               ),
