@@ -8,18 +8,27 @@ class ClientHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final productProvider = context.watch<ProductsClientProvider>();
+    final productProvider = context.watch<ProductsUserProvider>();
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title:  Text('Inicio', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+        ),
         body: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              Text('Inicio', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-              SizedBox(height: 10),
               Expanded(
-                child: GridView.builder(
+                child: productProvider.listProduct.isEmpty ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Text('No hay productos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                              ),
+                    ],
+                  ):GridView.builder(
 
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
 
@@ -80,16 +89,15 @@ class ClientHomePage extends StatelessWidget {
 
                               IconButton(
                                 
-                                tooltip: product.stockProduct != 0 ? 'Añadir al carrito' : 'No hay productos en stock',
+                                tooltip: product.stockProduct == 0 ? 'No hay productos' : 'Añadir al carrito',
                                 
                                 onPressed: product.stockProduct == 0 ? null : (){
                           
-                                  if(product.stockProduct <= 0) return;
-
+                                  if(product.stockProduct <= 0){
+                                    return;
+                                  } 
                                   product.stockProduct --;
-                                  
                                   product.cantidadAgregada ++;
-                                  
                                   if(productProvider.listCart.any((p) => p.nameProduct == product.nameProduct)) return productProvider.updateCart();
 
                                   productProvider.addCart(product);

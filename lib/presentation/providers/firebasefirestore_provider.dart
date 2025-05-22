@@ -15,6 +15,7 @@ class FirebasefirestoreProvider extends ChangeNotifier {
 
   bool isLoading = false;
   bool isUploaded = false;
+  bool ispurchased = false;
 
   String nameProduct = '';
   String descriptionProduct = '';
@@ -59,54 +60,54 @@ class FirebasefirestoreProvider extends ChangeNotifier {
   }
 
   bool validateTextField() {
-  bool isValid = true;
+    bool isValid = true;
 
-  if (nameProduct.isEmpty) {
-    errorName = 'El nombre es obligatorio';
-    isValid = false;
-  } else {
-    errorName = null;
+    if (nameProduct.isEmpty) {
+      errorName = 'El nombre es obligatorio';
+      isValid = false;
+    } else {
+      errorName = null;
+    }
+
+    if (descriptionProduct.isEmpty) {
+      errorDescription = 'La descripción es obligatoria';
+      isValid = false;
+    } else {
+      errorDescription = null;
+    }
+
+    if (priceInput.isEmpty) {
+      errorPrice = 'El precio es obligatorio';
+      isValid = false;
+    } else if (int.tryParse(priceInput) == null) {
+      errorPrice = 'No es un valor numérico';
+      isValid = false;
+    } else {
+      errorPrice = null;
+      priceProduct = int.parse(priceInput);
+    }
+
+    if (stockInput.isEmpty) {
+      errorStock = 'El stock es obligatorio';
+      isValid = false;
+    } else if (int.tryParse(stockInput) == null) {
+      errorStock = 'No es un valor numérico';
+      isValid = false;
+    } else {
+      errorStock = null;
+      stockProduct = int.parse(stockInput);
+    }
+
+    if (imageToUpload == null) {
+      errorImage = 'Debe seleccionar una imagen';
+      isValid = false;
+    } else {
+      errorImage = null;
+    }
+
+    notifyListeners();
+    return isValid;
   }
-
-  if (descriptionProduct.isEmpty) {
-    errorDescription = 'La descripción es obligatoria';
-    isValid = false;
-  } else {
-    errorDescription = null;
-  }
-
-  if (priceInput.isEmpty) {
-    errorPrice = 'El precio es obligatorio';
-    isValid = false;
-  } else if (int.tryParse(priceInput) == null) {
-    errorPrice = 'No es un valor numérico';
-    isValid = false;
-  } else {
-    errorPrice = null;
-    priceProduct = int.parse(priceInput);
-  }
-
-  if (stockInput.isEmpty) {
-    errorStock = 'El stock es obligatorio';
-    isValid = false;
-  } else if (int.tryParse(stockInput) == null) {
-    errorStock = 'No es un valor numérico';
-    isValid = false;
-  } else {
-    errorStock = null;
-    stockProduct = int.parse(stockInput);
-  }
-
-  if (imageToUpload == null) {
-    errorImage = 'Debe seleccionar una imagen';
-    isValid = false;
-  } else {
-    errorImage = null;
-  }
-
-  notifyListeners();
-  return isValid;
-}
 
   bool validateEditFields() {
     bool isValid = true;
@@ -148,57 +149,57 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     required String? description,
     required String? price,
     required String? stock,
-}) {
-  bool isValid = true;
+  }) {
+    bool isValid = true;
 
-  if (name == null || name.trim().isEmpty) {
-    errorName = 'Nombre no puede estar vacío';
-    isValid = false;
-  } else {
-    errorName = null;
-  }
-  if (description == null || description.trim().isEmpty) {
-    errorDescription = 'Descripcion no puede estar vacío';
-    isValid = false;
-  } else {
-    errorDescription = null;
-  }
+    if (name == null || name.trim().isEmpty) {
+      errorName = 'Nombre no puede estar vacío';
+      isValid = false;
+    } else {
+      errorName = null;
+    }
+    if (description == null || description.trim().isEmpty) {
+      errorDescription = 'Descripcion no puede estar vacío';
+      isValid = false;
+    } else {
+      errorDescription = null;
+    }
 
-  if (price == null || price.trim().isEmpty) {
-  errorPrice = 'El campo de precio no puede estar vacío';
-  isValid = false;
-} else {
-  final priceValue = int.tryParse(price.trim());
-  if (priceValue == null) {
-    errorPrice = 'Debe ser un número válido';
-    isValid = false;
-  } else if (priceValue < 0) {
-    errorPrice = 'Debe ser un número positivo';
-    isValid = false;
-  } else {
-    errorPrice = null;
-  }
-}
+    if (price == null || price.trim().isEmpty) {
+      errorPrice = 'El campo de precio no puede estar vacío';
+      isValid = false;
+    } else {
+      final priceValue = int.tryParse(price.trim());
+      if (priceValue == null) {
+        errorPrice = 'Debe ser un número válido';
+        isValid = false;
+      } else if (priceValue < 0) {
+        errorPrice = 'Debe ser un número positivo';
+        isValid = false;
+      } else {
+        errorPrice = null;
+      }
+    }
 
-  if (stock == null || stock.trim().isEmpty) {
-  errorStock = 'El campo stock no puede estar vacío';
-  isValid = false;
-} else {
-  final stockValue = int.tryParse(stock.trim());
-  if (stockValue == null) {
-    errorStock = 'Debe ser un número válido';
-    isValid = false;
-  } else if (stockValue < 0) {
-    errorStock = 'Debe ser un número positivo';
-    isValid = false;
-  } else {
-    errorStock = null;
-  }
-}
+    if (stock == null || stock.trim().isEmpty) {
+      errorStock = 'El campo stock no puede estar vacío';
+      isValid = false;
+    } else {
+      final stockValue = int.tryParse(stock.trim());
+      if (stockValue == null) {
+        errorStock = 'Debe ser un número válido';
+        isValid = false;
+      } else if (stockValue < 0) {
+        errorStock = 'Debe ser un número positivo';
+        isValid = false;
+      } else {
+        errorStock = null;
+      }
+    }
 
-  notifyListeners();
-  return isValid;
-}
+    notifyListeners();
+    return isValid;
+  }
   void getNewName(String value){
     newNameProduct = value;
     notifyListeners();
@@ -208,33 +209,33 @@ class FirebasefirestoreProvider extends ChangeNotifier {
     notifyListeners();
   }
   void getNewStock(String value){
-  final parsedValue = int.tryParse(value);
-  if (parsedValue != null) {
-    newStockProduct = parsedValue;
-  } else {
-    errorStock = 'El valor del stock no es numérico';
+    final parsedValue = int.tryParse(value);
+    if (parsedValue != null) {
+      newStockProduct = parsedValue;
+    } else {
+      errorStock = 'El valor del stock no es numérico';
+    }
+    notifyListeners();
   }
-  notifyListeners();
-}
 
-void getnewprice(String value){
-  final parsedValue = int.tryParse(value);
-  if (parsedValue != null) {
-    newPriceProduct = parsedValue;
-  } else {
-    errorPrice = 'El valor del precio no es numérico';
+  void getnewprice(String value){
+    final parsedValue = int.tryParse(value);
+    if (parsedValue != null) {
+      newPriceProduct = parsedValue;
+    } else {
+      errorPrice = 'El valor del precio no es numérico';
+    }
+    notifyListeners();
   }
-  notifyListeners();
-}
   
   void loadProductToEdit(Product product) {
-  newNameProduct = product.nameProduct;
-  newDescriptionProduct = product.descriptionProduct;
-  newPriceProduct = product.priceProduct;
-  newStockProduct = product.stockProduct;
-  imageurl = product.imageurl;
-  notifyListeners();
-}
+    newNameProduct = product.nameProduct;
+    newDescriptionProduct = product.descriptionProduct;
+    newPriceProduct = product.priceProduct;
+    newStockProduct = product.stockProduct;
+    imageurl = product.imageurl;
+    notifyListeners();
+  }
 
   void getName(String value){
     nameProduct = value;
@@ -308,10 +309,7 @@ void getnewprice(String value){
       
       await firestore.collection('productos').doc(sku).set(product.tofirebase());
       isUploaded = true;
-    } 
-    on FirebaseException catch (e) {
-      debugPrint(e.code);
-    } 
+    }  
     finally {
       isLoading = false;
       notifyListeners();
@@ -320,9 +318,9 @@ void getnewprice(String value){
 
   Future<List<Product>> getProducts() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('productos').get();
-    return querySnapshot.docs
-        .map((doc) => DatabaseProductsModel.fromFirestore(doc.data() as Map<String, dynamic>).toProductEntity())
-        .toList();
+    return querySnapshot.docs.map(
+      (doc) => DatabaseProductsModel.fromFirestore(doc.data() as Map<String, dynamic>).toProductEntity()
+    ).toList();
   }
 
   Future<void> getImage() async {
@@ -351,19 +349,15 @@ void getnewprice(String value){
 
   Future<void> deleteProduct(BuildContext context, Product product) async{
 
-    final clientProvider = context.read<ProductsClientProvider>();
+    final clientProvider = context.read<ProductsUserProvider>();
 
-    try{
-      isLoading = true;
-      clientProvider.deleteToList(product);
-      await firestore.collection("productos").doc(product.sku).delete();
-      isLoading = false;
-      isUploaded = true;
-    }on FirebaseException catch (e){
 
-      debugPrint(e.code);
+    isLoading = true;
+    clientProvider.deleteToList(product);
+    await firestore.collection("productos").doc(product.sku).delete();
+    isLoading = false;
+    isUploaded = true;
 
-    }
     isLoading = false;
     
     notifyListeners();
@@ -372,7 +366,7 @@ void getnewprice(String value){
   Future<void> setProduct(BuildContext context, Product product) async{
     isUploaded = false;
     isLoading = false;
-    final clientProvider = context.read<ProductsClientProvider>();
+    final clientProvider = context.read<ProductsUserProvider>();
 
     if (!validateEditFields()) return;
 
@@ -383,40 +377,38 @@ void getnewprice(String value){
       stockProduct: newStockProduct,
       priceProduct: newPriceProduct,
       sku: product.sku
-      );
-    
-    try{
+    );
+ 
+    isLoading = true;
+    await firestore.collection('productos').doc(product.sku).set(newProduct.tofirebase());
+    clientProvider.updateList();
 
-      isLoading = true;
-      await firestore.collection('productos').doc(product.sku).set(newProduct.tofirebase());
-      clientProvider.updateList();
-      debugPrint('producto actualizado');
-      isLoading = false;
-      isUploaded = true;
+    isLoading = false;
+    isUploaded = true;
 
-    }on FirebaseException catch (e){
-      debugPrint(e.code);
-    }
     isLoading = false;
     notifyListeners();
   }
 
   Future<void> updateStockAfterPurchase(String sku, int cantidad) async{
+    
+    isLoading = true;
+    
+    notifyListeners();
     final docRef = firestore.collection('productos').doc(sku);
 
-    try{
+    ispurchased = false;
+    final docSnapshot = await docRef.get();
 
-      final docSnapshot = await docRef.get();
-
-      if(docSnapshot.exists){
-        int stockActual = docSnapshot.get('stock');
-        int nuevoStock = stockActual - cantidad;
-        if(nuevoStock < 0) nuevoStock = 0;
-        await docRef.update({'stock' : nuevoStock});
-      }
-
-    }on FirebaseException catch(e){
-      debugPrint(e.code);
+    if(docSnapshot.exists){
+      int stockActual = docSnapshot.get('stock');
+      int nuevoStock = stockActual - cantidad;
+      if(nuevoStock < 0) nuevoStock = 0;
+      await docRef.update({'stock' : nuevoStock});
     }
+      
+    ispurchased = true;
+    isLoading = false;
+    notifyListeners();
   }
 }

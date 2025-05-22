@@ -12,7 +12,7 @@ class AuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //TODO mejorar la captura de errores
+
     final authProvider = Provider.of<FirebaseAuthProvider>(context); //context.watch<AuthProvider>();
 
     if(authProvider.isLoading){
@@ -73,9 +73,7 @@ class AuthScreen extends StatelessWidget {
                         onPressed: () async{
                           if(authProvider.validateTextField()){
                             await authProvider.signIn();
-                  
-                            debugPrint(authProvider.email);
-                            debugPrint(authProvider.password);
+
                             authProvider.email = '';
                             authProvider.password = '';
                           }
@@ -88,7 +86,7 @@ class AuthScreen extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           authProvider.clearData();
-                          authProvider.role = 'Administrador';
+                          authProvider.role = 'Cliente';
                           Navigator.push(context, MaterialPageRoute<void>(
                           builder: (BuildContext context) => const RegisterScreen()));
                           

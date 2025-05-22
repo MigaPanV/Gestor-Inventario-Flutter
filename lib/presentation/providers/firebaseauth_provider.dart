@@ -77,10 +77,10 @@ class FirebaseAuthProvider extends ChangeNotifier{
       userAuthStatus();
       
     }on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found' || e.code == 'unknown-error') {
-        generalError = 'Datos ivalidos';
-      } else if (e.code == 'wrong-password') {
-        generalError = 'Contraseña incorrecta';
+      if (e.code == 'invalid-credential' || e.code == 'unknown-error') {
+        generalError = 'Contraseña o correo incorrecto';
+      } else if (e.code == 'network-request-failed') {
+        generalError = 'Conexion fallida';
       } 
       else if(e.code == "invalid-email"){
         generalError = 'Datos invalidos';
@@ -123,9 +123,9 @@ class FirebaseAuthProvider extends ChangeNotifier{
         emaillError = 'Correo electrónico invalido.';
       }else if(e.code == 'email-already-in-use'){
         emaillError = 'Correo ya registrado.';
+      }else if (e.code == 'network-request-failed') {
+        generalError = 'Conexion fallida';
       }
-      
-      debugPrint(e.code);
       isLoading = false;
     }
 
@@ -136,6 +136,7 @@ class FirebaseAuthProvider extends ChangeNotifier{
 
   Future<void> signOut () async{
     auth.signOut();
+    role = '';
     userAuthStatus();
     notifyListeners();
   }
@@ -161,20 +162,13 @@ class FirebaseAuthProvider extends ChangeNotifier{
 
   Future<void> assignUserRole(String uId, String rol, String email) async{
     
-    try{
       await firestore.collection('Usuarios').doc(uId).set({
         'correo': email,
         'rol': rol
       });
-    }on FirebaseException catch(e){
-      debugPrint(e.code);
-    }
-    debugPrint('Rol $rol asigando a $uId');
   }
 
   Future<String?> getUserRole(String uid) async{
-
-    try{
 
       DocumentSnapshot userDoc = await firestore.collection('Usuarios').doc(uid).get();
 
@@ -182,14 +176,7 @@ class FirebaseAuthProvider extends ChangeNotifier{
         return userDoc.get('rol');
       }
       else {
-        debugPrint('Documento de usuario no encontrado para UID: $uid');
         return null;
       }
-
-    }on FirebaseException catch(e){
-      debugPrint(e.code);
-      return null;
-    }
-    
   }
 }

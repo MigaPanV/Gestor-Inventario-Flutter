@@ -10,8 +10,6 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    //TODO mejorar la captura de errores
-
     final registerProvider = context.watch<FirebaseAuthProvider>();
     
     if(registerProvider.isLoading){
@@ -120,7 +118,10 @@ class RegisterScreen extends StatelessWidget {
                                 if(registerProvider.validateTextField()){
                                   await registerProvider.register(registerProvider.email, registerProvider.password);
                                   await registerProvider.signOut();
+                                  registerProvider.email = '';
+                                  registerProvider.password = '';
                                 }
+                                
                                 
                               },
                               child: Text('Registrarse')

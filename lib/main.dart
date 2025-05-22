@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/screens/admin/admin_home_screen.dart';
+import 'package:gestor_inventario/presentation/screens/auth/loading_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:gestor_inventario/firebase_options.dart';
 
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => FirebaseAuthProvider()),
-        ChangeNotifierProvider(create: (_) => ProductsClientProvider()..addToList()),
+        ChangeNotifierProvider(create: (_) => ProductsUserProvider()..addToList()),
         ChangeNotifierProvider(create: (_) => FirebasefirestoreProvider())
       ],
       child: Consumer<FirebaseAuthProvider>(
@@ -43,7 +44,9 @@ class MyApp extends StatelessWidget {
             ),
             home: authProvider.user == null 
             ? AuthScreen() 
-            : authProvider.user != null && authProvider.role == 'Cliente' ? ClientScreen() : AdminHomeScreen(),
+            : authProvider.user != null && authProvider.role == 'Cliente' 
+            ? ClientScreen() 
+            : authProvider.user != null && authProvider.role == 'Administrador' ? AdminHomeScreen() : LoadingScreen(text: 'Verificando datos'),
           );
         },
       ),

@@ -6,7 +6,7 @@ import 'package:gestor_inventario/presentation/providers/firebasefirestore_provi
 import 'package:gestor_inventario/presentation/widgets/shared/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
-class ProductsClientProvider extends ChangeNotifier{
+class ProductsUserProvider extends ChangeNotifier{
 
   List<Product> listProduct = [
   //  Product(
@@ -58,15 +58,10 @@ class ProductsClientProvider extends ChangeNotifier{
   }
 
   Future<void> updateList() async{
-    
-    try{
-      final updatedproducts = await FirebasefirestoreProvider().getProducts();
-      listProduct = updatedproducts;
-      notifyListeners();
 
-    } on FirebaseException catch (e){
-      debugPrint("Error al obtener productos: $e");
-    }
+    final updatedproducts = await FirebasefirestoreProvider().getProducts();
+    listProduct = updatedproducts;
+    notifyListeners();
 
   }
 
@@ -120,7 +115,7 @@ class ProductsClientProvider extends ChangeNotifier{
             }
 
             if (!firestore.isLoading && firestore.isUploaded) {
-              final productProvider = context.read<ProductsClientProvider>();
+              final productProvider = context.read<ProductsUserProvider>();
               return AlertDialog(
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -156,7 +151,7 @@ class ProductsClientProvider extends ChangeNotifier{
             return AlertDialog(
               title: Column(
                 children: [
-                  Text('Añadir producto'),
+                  Text('Añadir producto', style: TextStyle(fontWeight: FontWeight.w500)),
                   if (generalError.isNotEmpty)
                     Text(
                       generalError,
@@ -169,9 +164,10 @@ class ProductsClientProvider extends ChangeNotifier{
                     Text(
                       firestore.errorImage!,
                       style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400),
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400
+                      ),
                     ),
                 ],
               ),
@@ -201,14 +197,16 @@ class ProductsClientProvider extends ChangeNotifier{
                     ),
                     SizedBox(height: 20),
                     FilledButton(
-                        onPressed: () async {
-                          await firestore.getImage();
-                          setState(() {});
-                        },
-                        child: Text('Cargar foto')),
+                      onPressed: () async {
+                        await firestore.getImage();
+                        setState(() {});
+                      },
+                      child: Text('Cargar foto')
+                    ),
                   ],
                 ),
               ),
+              actionsAlignment: MainAxisAlignment.center,
               actions: [
                 TextButton(
                   onPressed: () {
@@ -251,7 +249,6 @@ class ProductsClientProvider extends ChangeNotifier{
       context: context, 
       builder: (dialogContext) {
 
-        
         return Consumer<FirebasefirestoreProvider>(
           builder: (context, firestore, _) => StatefulBuilder(
             builder: (context, setState)  {
@@ -304,7 +301,8 @@ class ProductsClientProvider extends ChangeNotifier{
                 );
               }
               return AlertDialog(
-                content: Text('¿Desea eliminar este articulo?'),
+                title: Text('¿Desea eliminar este articulo?', style: TextStyle(fontWeight: FontWeight.w500)),
+                actionsAlignment: MainAxisAlignment.center,
                 actions: [
                   TextButton(
                     onPressed: (){
@@ -388,7 +386,7 @@ class ProductsClientProvider extends ChangeNotifier{
                 );
               }
               return AlertDialog(
-                title: Text('Editar producto'),
+                title: Text('Editar producto', style: TextStyle(fontWeight: FontWeight.w500)),
                 content: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -428,6 +426,7 @@ class ProductsClientProvider extends ChangeNotifier{
                     ],
                   ),
                 ),
+                actionsAlignment: MainAxisAlignment.center,
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -465,7 +464,9 @@ class ProductsClientProvider extends ChangeNotifier{
                       firestore.getStock(stock);
                       firestore.getPrice(price);
 
-                      await firestore.setProduct(dialogContext, product);
+                      if(dialogContext.mounted){
+                        await firestore.setProduct(dialogContext, product);
+                      }
                       firestore.setLoading(false);
                       firestore.setUploaded(true);
                     },
@@ -482,29 +483,97 @@ class ProductsClientProvider extends ChangeNotifier{
 
   void openDialogSignout(BuildContext context){
 
-    final firebase = context.read<FirebaseAuthProvider>();
+    final firebase = context.read<FirebasefirestoreProvider>();
 
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('¿Desea cerrar sesión?'),
-        actions: [
-          TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar')),
-          FilledButton(
-              onPressed: () async{
-                await firebase.signOut();
-                Navigator.of(context).pop();
-                firebase.clearData();
-                selectedIndex = 0;
-              },
-              child: Text('Aceptar'))
-        ],
-      ),
+      builder: (dialogContext) => Consumer<FirebaseAuthProvider>(
+        builder: (context, auth, _) {
+          return StatefulBuilder(
+            builder: (context, snapshot) {
+
+              if (firebase.isLoading) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('Cerrando sesión', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                      )
+                    ],
+                  ),
+                );
+              }
+              if (!firebase.isLoading && firebase.isUploaded) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Sesión cerrada',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(Icons.check_circle, color: Colors.green, size: 40),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          
+                          firebase.isUploaded = false;
+                          Navigator.pop(dialogContext);
+                        },
+                        child: Text('Continuar'),
+                      )
+                    ],
+                  ),
+                );
+              }
+              return AlertDialog(
+                title: Text('¿Desea cerrar sesión?', style: TextStyle(fontWeight: FontWeight.w500)),
+                actionsAlignment: MainAxisAlignment.center,
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    child: Text('Cancelar')
+                  ),
+                  FilledButton(
+                    onPressed: () async{
+                      
+                      firebase.setLoading(true);
+                      for(var cart in listCart){
+                        cart.cantidadAgregada = 0;
+                      }
+                      await updateList();
+                      clearCart();
+                      await auth.signOut();
+
+                      auth.clearData();
+                      selectedIndex = 0;
+                      firebase.setLoading(false);
+                      firebase.setUploaded(true);
+                    },
+                    child: Text('Aceptar')
+                  )
+                ],
+              );
+            }
+          );
+          
+        },
+      )
     );
     notifyListeners();
   }
@@ -523,6 +592,7 @@ class ProductsClientProvider extends ChangeNotifier{
                 if (auth.isLoading) {
                   return AlertDialog(
                     content: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
@@ -544,11 +614,13 @@ class ProductsClientProvider extends ChangeNotifier{
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
                             'Administrador agregado',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis
                           ),
                           SizedBox(width: 10),
                           Icon(Icons.check_circle, color: Colors.green, size: 40),
@@ -568,7 +640,7 @@ class ProductsClientProvider extends ChangeNotifier{
                 );
               }
                 return AlertDialog(
-                  title: Text('Registrar administrador'),
+                  title: Text('Registrar administrador', style: TextStyle(fontWeight: FontWeight.w500)),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -585,6 +657,7 @@ class ProductsClientProvider extends ChangeNotifier{
                       )
                     ],
                   ),
+                  actionsAlignment: MainAxisAlignment.center,
                   actions: [
                     TextButton(
                       onPressed: (){
@@ -595,7 +668,10 @@ class ProductsClientProvider extends ChangeNotifier{
                     FilledButton(
                       onPressed: () async{
                         if(auth.validateTextField()){
+                          auth.role = 'Administrador';
                           await auth.register(auth.email, auth.password);
+                          auth.email = '';
+                          auth.password = '';
                         }
                         
                       }, 
@@ -617,8 +693,9 @@ class ProductsClientProvider extends ChangeNotifier{
       context: context, 
       builder: (dialogContext) => Consumer<FirebaseAuthProvider>(
         builder: (context, auth, _) => AlertDialog(
-          title: Text('Informacion de cuenta'),
+          title: Text('Informacion de cuenta', style: TextStyle(fontWeight: FontWeight.w500)),
           content: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('Correo: ${auth.user!.email}')
@@ -628,8 +705,123 @@ class ProductsClientProvider extends ChangeNotifier{
       )
     );
   }
+  void openCheckOut(BuildContext context){
+
+    showDialog(
+      context: context, 
+      builder: (dialogContext) {
+        return Consumer<FirebasefirestoreProvider>(
+          builder: (context, firestore, _) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                if(firestore.isLoading){
+                  return AlertDialog(
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text('Procesando compra', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                        )
+                      ],
+                    ),
+                  );
+                }
+                if(firestore.ispurchased && !firestore.isLoading){
+                  return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Compra finalizada',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(Icons.check_circle, color: Colors.green, size: 40),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          firestore.ispurchased = false;
+                          Navigator.pop(dialogContext);
+                        },
+                        child: Text('Continuar'),
+                      )
+                    ],
+                  ),
+                );
+
+                }
+                return AlertDialog(
+
+                  title: Text('Desea finalizar la compra', style: TextStyle(fontWeight: FontWeight.w500),),
+
+                  actionsAlignment: MainAxisAlignment.center,
+                  actions: [
+                    TextButton(
+                      onPressed: (){
+                        Navigator.pop(dialogContext);
+                      }, 
+                      child: Text('Cancelar')
+                    ),
+                    FilledButton(
+                      onPressed: () async{
+                        firestore.setLoading(true);
+
+                        for(var cart in listCart){
+
+                          await firestore.updateStockAfterPurchase(cart.sku, cart.cantidadAgregada);
+                          cart.cantidadAgregada = 0;
+
+                        }
+                        clearCart();
+                        firestore.setLoading(false);
+                      }, 
+                      child: Text('Continuar')
+                    )
+                  ]
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+    notifyListeners();
+  }
+
   void clearCart(){
     listCart.clear();
     notifyListeners();
+  }
+
+  void refresh(BuildContext context){
+
+    showDialog(
+      context: context, 
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text('Actualizando datos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+            )
+          ],
+        )
+      )
+    );
   }
 }

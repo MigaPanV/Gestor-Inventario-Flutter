@@ -11,15 +11,29 @@ class ClientCartPage extends StatelessWidget {
 
     //TODO mejora de la vision de los precios y añadir un snackbar al precionar el boton y no hayan productos en stock
 
-    final productCartProvider = context.watch<ProductsClientProvider>();
+    final productCartProvider = context.watch<ProductsUserProvider>();
     
     if(productCartProvider.listCart.isEmpty){
       return SafeArea(
         child: Scaffold(
           body: Center(
-            child: Text('No hay productos en el carrito.')
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppBar(
+                  centerTitle: true,
+                  title: Text('Carrito', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                ),
+
+                Expanded(
+                  child: Center(
+                    child: Text('No hay productos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+        )
       );
     }
     return SafeArea(
@@ -136,7 +150,9 @@ class ClientCartPage extends StatelessWidget {
                                 productCartProvider.updateCart();
                                 
                               },
-                              child: Icon(Icons.arrow_drop_up, size: 30))
+                              child: Tooltip(
+                                message: 'Añadir productos',
+                                child: Icon(Icons.arrow_drop_up, size: 30)))
                             ),
                           Positioned(
                             bottom: 0,
@@ -156,7 +172,9 @@ class ClientCartPage extends StatelessWidget {
                                 productCartProvider.updateCart();
 
                               },
-                              child: Icon(Icons.arrow_drop_down, size: 30),
+                              child: Tooltip(
+                                message: 'Eliminar productos',
+                                child: Icon(Icons.arrow_drop_down, size: 30)),
                             )
                           ),
                         ],
@@ -171,15 +189,10 @@ class ClientCartPage extends StatelessWidget {
         floatingActionButton: productCartProvider.listCart.isEmpty 
         ? FloatingActionButton(onPressed: null) 
         : FloatingActionButton(
+          tooltip: 'Finalizar comprar',
           onPressed: (){
+            productCartProvider.openCheckOut(context);
 
-            final firestorePorvider = context.read<FirebasefirestoreProvider>();
-            final cart = productCartProvider.listCart;
-
-            for(var item in cart){
-              firestorePorvider.updateStockAfterPurchase(item.sku, item.cantidadAgregada);
-            }
-            productCartProvider.clearCart();
           },
           child: Icon(Icons.shopping_bag)
         )

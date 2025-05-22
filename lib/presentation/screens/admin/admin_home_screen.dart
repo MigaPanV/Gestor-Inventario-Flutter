@@ -9,7 +9,7 @@ class AdminHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final productProvider = context.watch<ProductsClientProvider>();
+    final productProvider = context.watch<ProductsUserProvider>();
     final firestoreProvider = context.watch<FirebasefirestoreProvider>();
 
     return SafeArea(
@@ -35,11 +35,30 @@ class AdminHomeScreen extends StatelessWidget {
               ),
               IconButton(
                 tooltip: 'Cuenta',
-                onPressed: (){
-                  productProvider.openInfoCount(context);
+                onPressed: ()async{
+                
+                  firestoreProvider.setLoading(true);
+                  if(firestoreProvider.isLoading){
+                    productProvider.refresh(context);
+                    await productProvider.updateList();
+                  }
+
+                  firestoreProvider.setLoading(false);
+                  if(!firestoreProvider.isLoading){ 
+                    if(context.mounted){
+                      Navigator.pop(context);
+                    }
+                  }
                 }, 
-                icon: Icon(Icons.account_circle_outlined)
+                icon: Icon(Icons.refresh)
               ),
+              //IconButton(
+              //  tooltip: 'Cuenta',
+              //  onPressed: (){
+              //    productProvider.openInfoCount(context);
+              //  }, 
+              //  icon: Icon(Icons.account_circle_outlined)
+              //),
               IconButton(
                 tooltip: 'Añadir adminsitrador',
                 onPressed: (){

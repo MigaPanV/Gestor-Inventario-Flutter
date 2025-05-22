@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:gestor_inventario/presentation/screens/client/pages/client_cart_page.dart';
 import 'package:gestor_inventario/presentation/screens/client/pages/client_home_page.dart';
@@ -11,7 +12,8 @@ class ClientScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final TextStyle style = TextStyle(fontSize: 15, fontWeight: FontWeight.w400);
-    final clientProvider = context.watch<ProductsClientProvider>();
+    final clientProvider = context.watch<ProductsUserProvider>();
+    final firebase = context.watch<FirebasefirestoreProvider>();
 
     int selectedIndex = clientProvider.selectedIndex;
 
@@ -69,12 +71,38 @@ class ClientScreen extends StatelessWidget {
                       right: 10,
                       child: IconButton(
                         tooltip: 'Cuenta',
-                        onPressed: (){
-                          clientProvider.openInfoCount(context);
+                        onPressed: ()async{
+
+                          firebase.setLoading(true);
+                          if(firebase.isLoading){
+                            clientProvider.refresh(context);
+                            await clientProvider.updateList();
+                          }
+                          for ( var cart in clientProvider.listCart){
+                            cart.cantidadAgregada = 0;
+                          }
+                          clientProvider.clearCart();
+                          firebase.setLoading(false);
+                          if(!firebase.isLoading){ 
+                            if(context.mounted){
+                              Navigator.pop(context);
+                            }
+                          }
                         }, 
-                        icon: Icon(Icons.account_circle_outlined)
+                        icon: Icon(Icons.refresh)
                       ),
                     )
+                    //Positioned(
+                    //  top: 10,
+                    //  right: 10,
+                    //  child: IconButton(
+                    //    tooltip: 'Cuenta',
+                    //    onPressed: (){
+                    //      clientProvider.openInfoCount(context);
+                    //    }, 
+                    //    icon: Icon(Icons.account_circle_outlined)
+                    //  ),
+                    //)
                   ]
                 )
               )
