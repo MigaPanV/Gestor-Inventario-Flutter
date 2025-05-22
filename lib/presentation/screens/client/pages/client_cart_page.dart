@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gestor_inventario/presentation/providers/firebasefirestore_provider.dart';
 import 'package:gestor_inventario/presentation/providers/products_user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -8,8 +7,6 @@ class ClientCartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    //TODO mejora de la vision de los precios y añadir un snackbar al precionar el boton y no hayan productos en stock
 
     final productCartProvider = context.watch<ProductsUserProvider>();
     
