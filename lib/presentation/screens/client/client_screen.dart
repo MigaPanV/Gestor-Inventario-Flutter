@@ -70,7 +70,7 @@ class ClientScreen extends StatelessWidget {
                       top: 10,
                       right: 10,
                       child: IconButton(
-                        tooltip: 'Cuenta',
+                        tooltip: 'Recargar',
                         onPressed: ()async{
 
                           firebase.setLoading(true);

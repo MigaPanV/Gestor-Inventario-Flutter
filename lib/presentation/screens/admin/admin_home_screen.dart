@@ -35,7 +35,7 @@ class AdminHomeScreen extends StatelessWidget {
                 ),
               ),
               IconButton(
-                tooltip: 'Cuenta',
+                tooltip: 'Recargar',
                 onPressed: ()async{
                 
                   firestoreProvider.setLoading(true);
